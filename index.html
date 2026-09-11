@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="assets/icon-leaf.svg" type="image/svg+xml" />
+    <title>京华自然 · 北京自然图鉴</title>
+    <link rel="stylesheet" href="styles/main.css" />
+  </head>
+  <body>
+    <main class="overview-page">
+      <header class="overview-header">
+        <a class="brand" href="index.html" aria-label="京华自然首页">
+          <span class="brand-mark">京</span>
+          <span class="brand-name">京华自然</span>
+        </a>
+        <nav class="site-nav" aria-label="主导航">
+          <a class="is-active" href="index.html">首页</a>
+          <a href="categories.html?group=1">花木</a>
+          <a href="categories.html?group=2">湿地</a>
+          <a href="categories.html?group=3">鸟类</a>
+          <a href="categories.html?group=4">古树</a>
+          <a href="categories.html?group=5">山地</a>
+          <a href="guide.html">观赏攻略</a>
+        </nav>
+        <span class="edition">BEIJING NATURAL ATLAS / 10 CATEGORIES</span>
+      </header>
+
+      <div class="overview-carousel" aria-label="十个主题线稿到完整版轮播">
+        <div class="overview-carousel-images" id="overviewCarouselImages"></div>
+        <div class="overview-carousel-meta">
+          <strong id="overviewCarouselTitle">早春玉兰</strong>
+        </div>
+      </div>
+
+      <section class="overview-intro">
+        <div class="overview-copy">
+          <span class="overview-kicker">北京自然图鉴</span>
+          <h1>京华自然</h1>
+          <p>从一朵早春花，到一条穿城而过的河流，重新看见北京的自然脉络。</p>
+          <div class="overview-actions">
+            <button class="overview-action" id="exhibitionMode" type="button">播放展览</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="season-filter" aria-label="按季节筛选">
+        <span class="season-label">自然年历</span>
+        <button class="season-button is-active" type="button" data-season="all">全年</button>
+        <button class="season-button" type="button" data-season="spring">春</button>
+        <button class="season-button" type="button" data-season="summer">夏</button>
+        <button class="season-button" type="button" data-season="autumn">秋</button>
+        <button class="season-button" type="button" data-season="winter">冬</button>
+      </section>
+
+      <nav class="category-guide" aria-label="北京自然类别导览">
+        <a class="category-item category-item-active" data-season="spring" href="yulan.html?from=home">
+          <span class="category-number">01</span>
+          <span class="category-copy"><strong>早春玉兰</strong><small>先花后叶 · 古建春景</small></span>
+        </a>
+        <a class="category-item category-item-active" data-season="spring" href="eryuelan.html?from=home">
+          <span class="category-number">02</span>
+          <span class="category-copy"><strong>林下二月兰</strong><small>蓝紫花海 · 城市地被</small></span>
+        </a>
+        <a class="category-item category-item-active" data-season="spring summer autumn" href="species.html?species=yueji&from=home">
+          <span class="category-number">03</span>
+          <span class="category-copy"><strong>城市月季</strong><small>北京市花 · 漫长花期</small></span>
+        </a>
+        <a class="category-item category-item-active" data-season="spring summer autumn winter" href="species.html?species=luwei&from=home">
+          <span class="category-number">04</span>
+          <span class="category-copy"><strong>湿地芦苇</strong><small>水岸边界 · 湿地栖息地</small></span>
+        </a>
+        <a class="category-item category-item-active" data-season="summer" href="species.html?species=yuyan&from=home">
+          <span class="category-number">05</span>
+          <span class="category-copy"><strong>城楼雨燕</strong><small>古建巢址 · 城市共生</small></span>
+        </a>
+        <a class="category-item category-item-active" data-season="autumn winter" href="species.html?species=zhonghuaqiushaya&from=home">
+          <span class="category-number">06</span>
+          <span class="category-copy"><strong>清流秋沙鸭</strong><small>清洁河流 · 生态指示</small></span>
+        </a>
+        <a class="category-item category-item-active" data-season="autumn" href="species.html?species=yinxing&from=home">
+          <span class="category-number">07</span>
+          <span class="category-copy"><strong>秋日银杏</strong><small>金色叶片 · 城市时间</small></span>
+        </a>
+        <a class="category-item category-item-active" data-season="all" href="species.html?species=cebai&from=home">
+          <span class="category-number">08</span>
+          <span class="category-copy"><strong>古柏森然</strong><small>四季常青 · 历史空间</small></span>
+        </a>
+        <a class="category-item category-item-active" data-season="autumn" href="species.html?species=xiangshanhongye&from=home">
+          <span class="category-number">09</span>
+          <span class="category-copy"><strong>香山秋色</strong><small>山地色彩 · 季节仪式</small></span>
+        </a>
+        <a class="category-item category-item-active" data-season="all" href="species.html?species=yongdinghe&from=home">
+          <span class="category-number">10</span>
+          <span class="category-copy"><strong>永定河脉</strong><small>水系生态 · 城市连接</small></span>
+        </a>
+      </nav>
+
+      <footer class="overview-footer">
+        <span>BEIJING / NATURE / MEMORY</span>
+        <span>01 — 10</span>
+      </footer>
+    </main>
+    <script src="scripts/overview.js"></script>
+  </body>
+</html>

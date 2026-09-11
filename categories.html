@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="assets/icon-leaf.svg" type="image/svg+xml" />
+    <title>分类 · 京华自然</title>
+    <link rel="stylesheet" href="styles/main.css" />
+  </head>
+  <body>
+    <main class="categories-page">
+      <header class="overview-header">
+        <a class="brand" href="index.html" aria-label="京华自然首页">
+          <span class="brand-mark">京</span>
+          <span class="brand-name">京华自然</span>
+        </a>
+        <nav class="site-nav" aria-label="主导航" id="categoryNav">
+          <a href="index.html">首页</a>
+          <a class="is-active" data-group="1" href="categories.html?group=1">花木</a>
+          <a data-group="2" href="categories.html?group=2">湿地</a>
+          <a data-group="3" href="categories.html?group=3">鸟类</a>
+          <a data-group="4" href="categories.html?group=4">古树</a>
+          <a data-group="5" href="categories.html?group=5">山地</a>
+          <a href="guide.html">观赏攻略</a>
+        </nav>
+        <span class="edition" id="categoryEdition">BEIJING NATURAL ATLAS / 01 CATEGORIES</span>
+      </header>
+
+      <div class="overview-carousel" aria-label="本类别主题线稿到完整版轮播">
+        <div class="overview-carousel-images" id="categoryCarouselImages"></div>
+        <div class="overview-carousel-meta">
+          <strong id="categoryCarouselTitle"></strong>
+        </div>
+      </div>
+
+      <section class="categories-intro">
+        <div class="categories-intro-head">
+          <span class="overview-kicker" id="categoryKicker"></span>
+          <span class="category-note" id="categoryNote"></span>
+        </div>
+        <h1 id="categoryTitle"></h1>
+        <p id="categoryLead"></p>
+      </section>
+
+      <section class="category-groups" id="categoryGroups">
+        <div class="category-themes" id="categoryThemes"></div>
+      </section>
+
+      <footer class="overview-footer">
+        <span>BEIJING / NATURE / MEMORY</span>
+        <span id="categoryFooterIndex"></span>
+      </footer>
+    </main>
+    <script src="scripts/categories.js"></script>
+  </body>
+</html>

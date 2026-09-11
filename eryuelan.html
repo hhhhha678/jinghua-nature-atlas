@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="assets/icon-leaf.svg" type="image/svg+xml" />
+    <title>林下二月兰 · 京华自然</title>
+    <script>if (new URLSearchParams(location.search).has('panel')) document.documentElement.classList.add('is-direct-entry');</script>
+    <link rel="stylesheet" href="styles/main.css" />
+  </head>
+  <body>
+    <main class="magnolia-page eryuelan-page">
+      <div class="scene-wash"></div>
+      <div class="scene-noise"></div>
+
+      <header class="minimal-header">
+          <a class="brand" href="index.html" aria-label="京华自然首页">
+          <span class="brand-mark">京</span>
+          <span class="brand-name">京华自然</span>
+        </a>
+        <span class="edition">NATURAL MEMORY / 03</span>
+        <nav class="site-nav" aria-label="主导航"><a href="index.html">首页</a><a class="is-active" href="categories.html?group=1">花木</a><a href="categories.html?group=2">湿地</a><a href="categories.html?group=3">鸟类</a><a href="categories.html?group=4">古树</a><a href="categories.html?group=5">山地</a><a href="guide.html">观赏攻略</a></nav>
+      </header>
+
+      <a class="back-to-category" id="backToCategory" href="categories.html?group=1">返回分类页面</a>
+
+      <section class="magnolia-scene" id="magnoliaScene">
+        <div class="image-stage" aria-label="二月兰生长与上色过程">
+          <img class="stage-image stage-background" src="material/shouye/02-eryuelan-line.jpeg" alt="" />
+          <img class="stage-image stage-line" src="material/shouye/02-eryuelan-line.jpeg" alt="" />
+          <img class="stage-image stage-half" src="material/shouye/02-eryuelan-transition.jpeg" alt="" />
+          <img class="stage-image stage-color" src="material/shouye/02-eryuelan-full.jpeg" alt="" />
+        </div>
+        <div class="mist mist-one"></div>
+        <div class="mist mist-two"></div>
+        <div class="sun-haze"></div>
+
+        <div class="scene-copy">
+          <span class="location">北京早春 · 二月兰</span>
+          <h1>林下二月兰</h1>
+          <p>蓝紫色小花铺在地面，把早春变成一片柔软的紫色雾气。</p>
+          <span class="caption">Orychophragmus violaceus</span>
+        </div>
+
+        <div class="scene-caption">
+          <span>BEIJING / SPRING</span>
+          <span>01 — 10</span>
+        </div>
+
+        <section class="detail-drawer" id="detailDrawer" aria-hidden="true">
+          <div class="drawer-inner">
+            <div class="drawer-heading">
+              <span>二月兰分节</span>
+              <strong>林下二月兰</strong>
+            </div>
+            <div class="drawer-links" aria-label="二月兰分节入口">
+              <button type="button" data-panel="form">
+                <span>01</span>
+                <strong>花期与形态</strong>
+              </button>
+              <button type="button" data-panel="season">
+                <span>02</span>
+                <strong>林下生境</strong>
+              </button>
+              <button type="button" data-panel="ground">
+                <span>03</span>
+                <strong>观赏分布</strong>
+              </button>
+              <button type="button" data-panel="city">
+                <span>04</span>
+                <strong>群落特征</strong>
+              </button>
+            </div>
+            <div class="drawer-place">北京 · 二月兰分类</div>
+          </div>
+        </section>
+
+        <section class="subpage-panel" id="subpagePanel" aria-hidden="true">
+          <div class="subpage-stage" id="subpageStage">
+            <div class="subpage-images" id="subpageImages" aria-hidden="true"></div>
+            <div class="subpage-atmosphere"></div>
+            <div class="subpage-heading" aria-hidden="true">
+              <span class="subpage-index" id="subpageIndex">01</span>
+                <h2 id="subpageTitle">花期与形态</h2>
+              </div>
+            <button class="subpage-close" id="subpageClose" type="button" aria-label="返回二月兰首页">返回二月兰首页</button>
+            <button class="subpage-reveal" id="subpageReveal" type="button" aria-label="展开或收起二月兰信息"></button>
+            <label class="subpage-scrubber" aria-label="拖动查看二月兰从形态到色彩的变化">
+              <span>从形态到色彩</span>
+              <input id="subpageScrubber" type="range" min="0" max="100" value="0" />
+            </label>
+            <article class="subpage-inner" id="subpageInfo" aria-hidden="true">
+              <div class="subpage-info-top">
+                <span class="subpage-info-index" id="subpageInfoIndex">01</span>
+              </div>
+              <h3 id="subpageInfoTitle">花期与形态</h3>
+              <p id="subpageLead">二月兰在早春开放，蓝紫色小花常成片铺展。</p>
+              <div class="subpage-content" id="subpageContent"></div>
+            </article>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="scripts/eryuelan.js"></script>
+  </body>
+</html>

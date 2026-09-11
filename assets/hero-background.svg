@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800" >
+
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f1b39"/>
+      <stop offset="52%" stop-color="#203d63"/>
+      <stop offset="100%" stop-color="#f4d7b5"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="42%" r="40%">
+      <stop offset="0%" stop-color="#fff4d8" stop-opacity="0.9"/>
+      <stop offset="65%" stop-color="#fff4d8" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#fff4d8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="mist" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d4eef9" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#f6c8de" stop-opacity="0.06"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#sky)"/>
+  <circle cx="620" cy="260" r="290" fill="url(#glow)"/>
+  <ellipse cx="300" cy="520" rx="280" ry="130" fill="#79a672" opacity="0.45"/>
+  <ellipse cx="620" cy="560" rx="440" ry="170" fill="#6b9169" opacity="0.55"/>
+  <ellipse cx="940" cy="520" rx="250" ry="150" fill="#91b77a" opacity="0.4"/>
+  <path d="M0 520C150 450 260 470 360 520C450 565 560 590 700 540C830 492 940 456 1200 520V800H0Z" fill="#d9c3a4" opacity="0.72"/>
+  <path d="M0 560C120 530 220 590 330 580C460 568 520 496 640 518C800 548 910 614 1200 560V800H0Z" fill="#99b98a" opacity="0.4"/>
+  <path d="M80 630C140 590 210 600 270 640C330 680 380 676 450 642C520 610 580 604 640 632C710 664 770 690 850 668C920 648 980 614 1120 636" fill="none" stroke="#fff6e8" stroke-opacity="0.28" stroke-width="4" stroke-linecap="round"/>
+  <g opacity="0.35">
+    <circle cx="160" cy="150" r="3" fill="#fff"/>
+    <circle cx="240" cy="110" r="2" fill="#fff"/>
+    <circle cx="1020" cy="130" r="3" fill="#fff"/>
+    <circle cx="920" cy="180" r="2" fill="#fff"/>
+    <circle cx="690" cy="95" r="2" fill="#fff"/>
+  </g>
+  <rect width="1200" height="800" fill="url(#mist)"/>
+
+</svg>

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="assets/icon-leaf.svg" type="image/svg+xml" />
+    <title>早春玉兰 · 京华自然</title>
+    <script>if (new URLSearchParams(location.search).has('panel')) document.documentElement.classList.add('is-direct-entry');</script>
+    <link rel="stylesheet" href="styles/main.css" />
+  </head>
+  <body>
+    <main class="magnolia-page">
+      <div class="scene-wash"></div>
+      <div class="scene-noise"></div>
+
+      <header class="minimal-header">
+          <a class="brand" href="index.html" aria-label="京华自然首页">
+          <span class="brand-mark">京</span>
+          <span class="brand-name">京华自然</span>
+        </a>
+        <span class="edition">NATURAL MEMORY / 01</span>
+        <nav class="site-nav" aria-label="主导航"><a href="index.html">首页</a><a class="is-active" href="categories.html?group=1">花木</a><a href="categories.html?group=2">湿地</a><a href="categories.html?group=3">鸟类</a><a href="categories.html?group=4">古树</a><a href="categories.html?group=5">山地</a><a href="guide.html">观赏攻略</a></nav>
+      </header>
+
+      <a class="back-to-category" id="backToCategory" href="categories.html?group=1">返回分类页面</a>
+
+      <section class="magnolia-scene" id="magnoliaScene">
+        <div class="image-stage" aria-label="玉兰生长与上色过程">
+          <img class="stage-image stage-background" src="material/shouye/01-yulan-line.jpeg" alt="" />
+          <img class="stage-image stage-line" src="material/shouye/01-yulan-line.jpeg" alt="" />
+          <img class="stage-image stage-half" src="material/shouye/01-yulan-transition.jpeg" alt="" />
+          <img class="stage-image stage-color" src="material/shouye/01-yulan-full.jpeg" alt="" />
+        </div>
+        <div class="mist mist-one"></div>
+        <div class="mist mist-two"></div>
+        <div class="sun-haze"></div>
+
+        <div class="scene-copy">
+          <span class="location">北京早春 · 玉兰</span>
+          <h1>玉兰</h1>
+          <p>白色花冠，像一段安静而明亮的春风。</p>
+          <span class="caption">Magnolia denudata</span>
+        </div>
+
+        <div class="scene-caption">
+          <span>BEIJING / SPRING</span>
+          <span>01 — 10</span>
+        </div>
+
+        <section class="detail-drawer" id="detailDrawer" aria-hidden="true">
+          <div class="drawer-inner">
+            <div class="drawer-heading">
+              <span>玉兰分节</span>
+              <strong>北京玉兰</strong>
+            </div>
+            <div class="drawer-links" aria-label="玉兰分节入口">
+              <button type="button" data-panel="form">
+                <span>01</span>
+                <strong>花期与形态</strong>
+              </button>
+              <button type="button" data-panel="season">
+                <span>02</span>
+                <strong>栽植环境</strong>
+              </button>
+              <button type="button" data-panel="garden">
+                <span>03</span>
+                <strong>城市分布</strong>
+              </button>
+              <button type="button" data-panel="culture">
+                <span>04</span>
+                <strong>物种特征</strong>
+              </button>
+            </div>
+            <div class="drawer-place">北京 · 玉兰分类</div>
+          </div>
+        </section>
+
+        <section class="subpage-panel" id="subpagePanel" aria-hidden="true">
+          <div class="subpage-stage" id="subpageStage">
+            <div class="subpage-images" id="subpageImages" aria-hidden="true"></div>
+            <div class="subpage-atmosphere"></div>
+            <div class="subpage-heading" aria-hidden="true">
+              <span class="subpage-index" id="subpageIndex">01</span>
+              <h2 id="subpageTitle">花期与形态</h2>
+            </div>
+            <button class="subpage-close" id="subpageClose" type="button" aria-label="返回玉兰首页">返回玉兰首页</button>
+            <button class="subpage-reveal" id="subpageReveal" type="button" aria-label="展开或收起玉兰信息"></button>
+            <label class="subpage-scrubber" aria-label="拖动查看玉兰从形态到色彩的变化">
+              <span>从形态到色彩</span>
+              <input id="subpageScrubber" type="range" min="0" max="100" value="0" />
+            </label>
+            <article class="subpage-inner" id="subpageInfo" aria-hidden="true">
+              <div class="subpage-info-top">
+                <span class="subpage-info-index" id="subpageInfoIndex">01</span>
+              </div>
+              <h3 id="subpageInfoTitle">花期与形态</h3>
+              <p id="subpageLead">玉兰在早春开放，花朵常先于叶片舒展。</p>
+              <div class="subpage-content" id="subpageContent"></div>
+            </article>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="scripts/main.js"></script>
+  </body>
+</html>

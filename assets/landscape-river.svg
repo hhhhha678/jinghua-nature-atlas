@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800" >
+
+    
+  <defs>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#14213d" flood-opacity="0.18"/>
+    </filter>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#f7f3ea" stop-opacity="0.88"/>
+    </linearGradient>
+  </defs>
+
+    <rect width="1200" height="800" fill="#dbeaf0"/>
+    <path d="M0 540C120 470 220 456 350 490C430 512 520 522 600 500C690 478 800 420 930 448C1040 472 1110 522 1200 504V800H0Z" fill="#86b184"/>
+    <path d="M0 610C110 566 220 552 335 574C456 598 520 638 620 628C740 616 808 560 920 542C1020 526 1110 550 1200 576V800H0Z" fill="#6f9a7a" opacity="0.8"/>
+    <path d="M180 550C230 500 280 466 344 436C430 394 492 378 572 386C632 392 700 424 746 474C694 492 626 510 554 528C456 554 338 586 180 550Z" fill="#f0d09c" opacity="0.82"/>
+    <path d="M620 326C708 256 784 218 858 214C915 210 972 230 1020 268C966 292 912 304 856 318C776 338 706 356 620 326Z" fill="#c77a5a" opacity="0.88"/>
+    <path d="M870 224C892 268 904 310 908 364" stroke="#7a5034" stroke-width="18" stroke-linecap="round" fill="none"/>
+    <path d="M900 246C942 248 986 264 1022 294" stroke="#7a5034" stroke-width="10" stroke-linecap="round" fill="none"/>
+    <path d="M884 278C836 284 794 304 748 336" stroke="#7a5034" stroke-width="10" stroke-linecap="round" fill="none"/>
+    <ellipse cx="825" cy="460" rx="180" ry="44" fill="#c0d9e8" opacity="0.9"/>
+    <ellipse cx="515" cy="560" rx="220" ry="38" fill="#b7d2de" opacity="0.72"/>
+    <path d="M112 650C220 616 324 620 430 650" stroke="#e9f7ff" stroke-width="6" stroke-linecap="round" opacity="0.6" fill="none"/>
+    <path d="M205 690C366 666 510 664 640 700" stroke="#e9f7ff" stroke-width="6" stroke-linecap="round" opacity="0.45" fill="none"/>
+  
+</svg>
