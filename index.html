@@ -4,8 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="assets/icon-leaf.svg" type="image/svg+xml" />
-    <title>京华自然 · 北京自然图鉴</title>
+    <title>京华自然志</title>
     <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/motion.css" />
   </head>
   <body>
     <main class="overview-page">
@@ -22,8 +23,10 @@
           <a href="categories.html?group=4">古树</a>
           <a href="categories.html?group=5">山地</a>
           <a href="guide.html">观赏攻略</a>
+          <a href="culture.html">自然文脉</a>
+          <a href="history.html">发展之路</a>
         </nav>
-        <span class="edition">BEIJING NATURAL ATLAS / 10 CATEGORIES</span>
+        <span class="edition">BEIJING NATURE CHRONICLE / 10 CATEGORIES</span>
       </header>
 
       <div class="overview-carousel" aria-label="十个主题线稿到完整版轮播">
@@ -35,8 +38,8 @@
 
       <section class="overview-intro">
         <div class="overview-copy">
-          <span class="overview-kicker">北京自然图鉴</span>
-          <h1>京华自然</h1>
+          <span class="overview-kicker">京华自然志</span>
+          <h1>京华自然志</h1>
           <p>从一朵早春花，到一条穿城而过的河流，重新看见北京的自然脉络。</p>
           <div class="overview-actions">
             <button class="overview-action" id="exhibitionMode" type="button">播放展览</button>
@@ -44,53 +47,65 @@
         </div>
       </section>
 
-      <section class="season-filter" aria-label="按季节筛选">
+      <section class="season-filter" aria-label="自然年历 · 按月份筛选主题">
         <span class="season-label">自然年历</span>
-        <button class="season-button is-active" type="button" data-season="all">全年</button>
-        <button class="season-button" type="button" data-season="spring">春</button>
-        <button class="season-button" type="button" data-season="summer">夏</button>
-        <button class="season-button" type="button" data-season="autumn">秋</button>
-        <button class="season-button" type="button" data-season="winter">冬</button>
+        <div class="month-track" id="monthTrack" role="group" aria-label="按观赏月份筛选">
+          <button class="season-button month-button is-active" type="button" data-month="0" aria-pressed="true">全年</button>
+          <button class="season-button month-button" type="button" data-month="1" aria-pressed="false">1月</button>
+          <button class="season-button month-button" type="button" data-month="2" aria-pressed="false">2月</button>
+          <button class="season-button month-button" type="button" data-month="3" aria-pressed="false">3月</button>
+          <button class="season-button month-button" type="button" data-month="4" aria-pressed="false">4月</button>
+          <button class="season-button month-button" type="button" data-month="5" aria-pressed="false">5月</button>
+          <button class="season-button month-button" type="button" data-month="6" aria-pressed="false">6月</button>
+          <button class="season-button month-button" type="button" data-month="7" aria-pressed="false">7月</button>
+          <button class="season-button month-button" type="button" data-month="8" aria-pressed="false">8月</button>
+          <button class="season-button month-button" type="button" data-month="9" aria-pressed="false">9月</button>
+          <button class="season-button month-button" type="button" data-month="10" aria-pressed="false">10月</button>
+          <button class="season-button month-button" type="button" data-month="11" aria-pressed="false">11月</button>
+          <button class="season-button month-button" type="button" data-month="12" aria-pressed="false">12月</button>
+        </div>
+        <p class="month-summary" id="monthSummary" aria-live="polite"></p>
+        <a class="month-map-link" id="monthMapLink" href="guide.html">在地图上查看 <span aria-hidden="true">→</span></a>
       </section>
 
       <nav class="category-guide" aria-label="北京自然类别导览">
-        <a class="category-item category-item-active" data-season="spring" href="yulan.html?from=home">
+        <a class="category-item category-item-active" data-slug="yulan" href="yulan.html?from=home">
           <span class="category-number">01</span>
           <span class="category-copy"><strong>早春玉兰</strong><small>先花后叶 · 古建春景</small></span>
         </a>
-        <a class="category-item category-item-active" data-season="spring" href="eryuelan.html?from=home">
+        <a class="category-item category-item-active" data-slug="eryuelan" href="eryuelan.html?from=home">
           <span class="category-number">02</span>
           <span class="category-copy"><strong>林下二月兰</strong><small>蓝紫花海 · 城市地被</small></span>
         </a>
-        <a class="category-item category-item-active" data-season="spring summer autumn" href="species.html?species=yueji&from=home">
+        <a class="category-item category-item-active" data-slug="yueji" href="species.html?species=yueji&from=home">
           <span class="category-number">03</span>
           <span class="category-copy"><strong>城市月季</strong><small>北京市花 · 漫长花期</small></span>
         </a>
-        <a class="category-item category-item-active" data-season="spring summer autumn winter" href="species.html?species=luwei&from=home">
+        <a class="category-item category-item-active" data-slug="luwei" href="species.html?species=luwei&from=home">
           <span class="category-number">04</span>
           <span class="category-copy"><strong>湿地芦苇</strong><small>水岸边界 · 湿地栖息地</small></span>
         </a>
-        <a class="category-item category-item-active" data-season="summer" href="species.html?species=yuyan&from=home">
+        <a class="category-item category-item-active" data-slug="yuyan" href="species.html?species=yuyan&from=home">
           <span class="category-number">05</span>
           <span class="category-copy"><strong>城楼雨燕</strong><small>古建巢址 · 城市共生</small></span>
         </a>
-        <a class="category-item category-item-active" data-season="autumn winter" href="species.html?species=zhonghuaqiushaya&from=home">
+        <a class="category-item category-item-active" data-slug="zhonghuaqiushaya" href="species.html?species=zhonghuaqiushaya&from=home">
           <span class="category-number">06</span>
           <span class="category-copy"><strong>清流秋沙鸭</strong><small>清洁河流 · 生态指示</small></span>
         </a>
-        <a class="category-item category-item-active" data-season="autumn" href="species.html?species=yinxing&from=home">
+        <a class="category-item category-item-active" data-slug="yinxing" href="species.html?species=yinxing&from=home">
           <span class="category-number">07</span>
           <span class="category-copy"><strong>秋日银杏</strong><small>金色叶片 · 城市时间</small></span>
         </a>
-        <a class="category-item category-item-active" data-season="all" href="species.html?species=cebai&from=home">
+        <a class="category-item category-item-active" data-slug="cebai" href="species.html?species=cebai&from=home">
           <span class="category-number">08</span>
           <span class="category-copy"><strong>古柏森然</strong><small>四季常青 · 历史空间</small></span>
         </a>
-        <a class="category-item category-item-active" data-season="autumn" href="species.html?species=xiangshanhongye&from=home">
+        <a class="category-item category-item-active" data-slug="xiangshanhongye" href="species.html?species=xiangshanhongye&from=home">
           <span class="category-number">09</span>
           <span class="category-copy"><strong>香山秋色</strong><small>山地色彩 · 季节仪式</small></span>
         </a>
-        <a class="category-item category-item-active" data-season="all" href="species.html?species=yongdinghe&from=home">
+        <a class="category-item category-item-active" data-slug="yongdinghe" href="species.html?species=yongdinghe&from=home">
           <span class="category-number">10</span>
           <span class="category-copy"><strong>永定河脉</strong><small>水系生态 · 城市连接</small></span>
         </a>
@@ -101,6 +116,8 @@
         <span>01 — 10</span>
       </footer>
     </main>
+    <script src="scripts/theme-calendar.js"></script>
     <script src="scripts/overview.js"></script>
+    <script src="scripts/motion.js"></script>
   </body>
 </html>

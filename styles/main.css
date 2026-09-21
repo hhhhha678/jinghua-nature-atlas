@@ -4,6 +4,12 @@
   --line: rgba(82, 102, 94, 0.22);
   --paper: #f4f1e9;
   --gold: #caa875;
+  /* 排版三阶：楷体做大标题、宋体做中大标题、黑体承担全部正文与信息 */
+  --font-display: "STKaiti", "KaiTi", "Kaiti SC", "FZKai-Z03", serif;
+  --font-serif-title: "Songti SC", "STSong", "SimSun", "Noto Serif SC", "Source Han Serif SC", serif;
+  --font-sans: "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei UI", "Microsoft YaHei",
+    "Noto Sans SC", "Source Han Sans SC", "Noto Sans CJK SC", sans-serif;
+  --font-latin: Georgia, "Times New Roman", serif;
 }
 
 * {
@@ -21,7 +27,9 @@ body {
   overflow: hidden;
   color: var(--ink);
   background: #e7eee7;
-  font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  text-rendering: optimizeLegibility;
 }
 
 button,
@@ -146,8 +154,9 @@ button {
   place-items: center;
   color: var(--paper);
   background: var(--ink);
-  font-family: "STSong", "Songti SC", serif;
+  font-family: var(--font-serif-title);
   font-size: 16px;
+  font-weight: 500;
 }
 
 .brand-name {
@@ -157,7 +166,7 @@ button {
 
 .edition {
   color: rgba(82, 102, 94, 0.52);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-latin);
   font-size: 10px;
   letter-spacing: 0.18em;
 }
@@ -331,21 +340,33 @@ button {
 .scene-caption,
 .drawer-heading span,
 .drawer-place {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-latin);
   letter-spacing: 0.16em;
+}
+
+/* 主题二级页的层级标识：这里就是「图鉴」这一层 */
+.scene-kicker {
+  display: block;
+  margin-bottom: 10px;
+  color: #8d7444;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
 }
 
 .location {
   display: block;
   margin-bottom: 18px;
-  color: #9b8c6b;
-  font-size: 11px;
+  color: #8d7444;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .scene-copy h1 {
   margin: 0;
   color: #587465;
-  font-family: "STKaiti", "KaiTi", "FZKai-Z03", serif;
+  font-family: var(--font-display);
   font-size: clamp(3rem, 5.2vw, 5.8rem);
   font-weight: 400;
   letter-spacing: 0.04em;
@@ -355,12 +376,12 @@ button {
 }
 
 .scene-copy p {
-  max-width: 300px;
+  max-width: 320px;
   margin: 27px 0 0;
-  color: var(--muted);
-  font-family: "STSong", "Songti SC", serif;
+  color: rgba(45, 65, 56, 0.86);
+  font-family: var(--font-sans);
   font-size: 16px;
-  line-height: 1.9;
+  line-height: 1.85;
 }
 
 .caption {
@@ -381,6 +402,145 @@ button {
   justify-content: space-between;
   color: rgba(82, 102, 94, 0.48);
   font-size: 10px;
+}
+
+/* 物种页延伸入口（观赏地图 / 文化作品 / 发展历程），与左上角"返回分类页面"左右对称 */
+.scene-links {
+  position: absolute;
+  top: 96px;
+  right: 42px;
+  z-index: 9;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px 20px;
+  max-width: min(430px, 46vw);
+}
+
+.scene-link {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 5px 0;
+  color: rgba(58, 82, 71, 0.88);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-shadow: 0 1px 12px rgba(255, 255, 255, 0.9);
+}
+
+.scene-link span {
+  display: inline-block;
+  color: #a68d61;
+  transition: transform 200ms ease;
+}
+
+.scene-link:hover span {
+  transform: translate(2px, -2px);
+}
+
+.scene-link::after {
+  position: absolute;
+  right: 0;
+  bottom: 1px;
+  left: 0;
+  height: 1px;
+  content: "";
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 220ms ease;
+}
+
+.scene-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* 物种页 · 自然年历（可赏月份即进入地图对应月份的入口） */
+.scene-calendar {
+  position: absolute;
+  top: 132px;
+  right: 42px;
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-latin);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-shadow: 0 1px 12px rgba(255, 255, 255, 0.9);
+}
+
+.scene-calendar-title {
+  color: rgba(82, 102, 94, 0.58);
+}
+
+.scene-calendar-track {
+  display: flex;
+  gap: 3px;
+}
+
+.scene-calendar-month {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+  color: rgba(82, 102, 94, 0.34);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-decoration: none;
+}
+
+a.scene-calendar-month {
+  color: #40584c;
+  background: rgba(139, 156, 118, 0.34);
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+a.scene-calendar-month:hover,
+a.scene-calendar-month:focus-visible {
+  color: #f7f4ec;
+  background: #7d9367;
+}
+
+@media (max-width: 900px) {
+  .scene-links {
+    top: 92px;
+    right: 20px;
+    gap: 2px 14px;
+    max-width: min(390px, 68vw);
+  }
+
+  .scene-link {
+    font-size: 11.5px;
+  }
+
+  .scene-calendar {
+    top: 126px;
+    right: 20px;
+    gap: 8px;
+  }
+
+  .scene-calendar-month {
+    width: 15px;
+    height: 15px;
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 640px) {
+  .scene-calendar-title {
+    display: none;
+  }
+
+  .scene-calendar {
+    top: 122px;
+  }
 }
 
 .detail-drawer {
@@ -431,7 +591,7 @@ button {
 
 .drawer-heading strong {
   color: #587465;
-  font-family: "STKaiti", "KaiTi", "FZKai-Z03", serif;
+  font-family: var(--font-display);
   font-size: 30px;
   font-weight: 400;
 }
@@ -504,16 +664,16 @@ button {
 
 .drawer-links button span {
   color: rgba(166, 141, 97, 0.82);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-latin);
   font-size: 11px;
   letter-spacing: 0.12em;
 }
 
 .drawer-links button strong {
-  font-family: "STSong", "Songti SC", serif;
-  font-size: 18px;
-  font-weight: 400;
-  letter-spacing: 0.08em;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 .drawer-links button::after {
@@ -546,11 +706,27 @@ button {
 
 html.is-direct-entry .scene-copy,
 html.is-direct-entry .scene-caption,
+html.is-direct-entry .scene-links,
+html.is-direct-entry .scene-calendar,
 html.is-direct-entry .detail-drawer,
 html.is-direct-entry .back-to-category {
   visibility: hidden;
   opacity: 0 !important;
   pointer-events: none;
+}
+
+/* 中文正文取消字距，避免方块字被拆散 */
+.subpage-content p,
+.subpage-inner > p,
+.scene-copy p,
+.overview-intro p,
+.categories-intro p,
+.guide-intro p,
+.atlas-intro p,
+.atlas-detail-lead,
+.atlas-detail-quote,
+.category-copy strong {
+  letter-spacing: 0;
 }
 
 html.is-direct-entry .subpage-panel.is-active {
@@ -805,16 +981,16 @@ html.is-direct-entry .subpage-panel.is-active {
 .subpage-index,
 .subpage-info-index {
   color: rgba(166, 141, 97, 0.78);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-latin);
   font-size: 12px;
   letter-spacing: 0.2em;
 }
 
 .subpage-heading h2 {
   margin: 16px 0 0;
-  font-family: "STSong", "Songti SC", serif;
+  font-family: var(--font-serif-title);
   font-size: clamp(2.6rem, 5vw, 5.5rem);
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: 0.04em;
   line-height: 0.95;
 }
@@ -1091,9 +1267,9 @@ html.is-direct-entry .subpage-panel.is-active {
   max-width: 100%;
   margin: 16px 0 0;
   color: #4f6a5d;
-  font-family: "STSong", "Songti SC", serif;
+  font-family: var(--font-serif-title);
   font-size: clamp(1.75rem, 2.25vw, 2.55rem);
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: 0.04em;
   line-height: 1.08;
 }
@@ -1112,8 +1288,8 @@ html.is-direct-entry .subpage-panel.is-active {
   max-width: 100%;
   margin: 18px 0 0;
   color: rgba(45, 65, 56, 0.92);
-  font-family: "STSong", "Songti SC", serif;
-  font-size: 13px;
+  font-family: var(--font-sans);
+  font-size: 15px;
   line-height: 1.85;
 }
 
@@ -1408,8 +1584,8 @@ html.is-direct-entry .subpage-panel.is-active {
   }
 
   .subpage-stage.is-culture .subpage-content p {
-    font-size: 12px;
-    line-height: 1.62;
+    font-size: 14px;
+    line-height: 1.72;
   }
 
 }
@@ -1476,29 +1652,32 @@ html.is-direct-entry .subpage-panel.is-active {
 }
 
 .overview-kicker {
-  color: #a68d61;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 11px;
-  letter-spacing: 0.2em;
+  color: #8d7444;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
 }
 
 .overview-intro h1 {
   margin: 12px 0 0;
   color: #587465;
-  font-family: "STKaiti", "KaiTi", "FZKai-Z03", serif;
+  font-family: var(--font-display);
   font-size: clamp(3.6rem, 7vw, 6.8rem);
   font-weight: 400;
   letter-spacing: 0.08em;
   line-height: 0.9;
+  /* 站名固定五个字，不允许折行 */
+  white-space: nowrap;
 }
 
 .overview-intro p {
   max-width: 390px;
   margin: 20px 0 0;
-  color: rgba(82, 102, 94, 0.72);
-  font-family: "STSong", "Songti SC", serif;
+  color: rgba(82, 102, 94, 0.82);
+  font-family: var(--font-sans);
   font-size: 16px;
-  line-height: 1.9;
+  line-height: 1.85;
 }
 
 .overview-actions {
@@ -1514,8 +1693,9 @@ html.is-direct-entry .subpage-panel.is-active {
   background: transparent;
   color: #52665e;
   cursor: pointer;
-  font-size: 12px;
-  letter-spacing: 0.12em;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
 }
 
 .overview-action:hover,
@@ -1525,10 +1705,11 @@ html.is-direct-entry .subpage-panel.is-active {
 }
 
 .overview-progress {
-  color: rgba(82, 102, 94, 0.58);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 11px;
-  letter-spacing: 0.1em;
+  color: rgba(82, 102, 94, 0.74);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
 }
 
 .overview-carousel {
@@ -1549,9 +1730,9 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
 .categories-page > .overview-footer { position: relative; z-index: 1; }
 .categories-intro { width: min(1120px, calc(100% - 84px)); margin: 0 auto; padding: 9vh 0 5vh; border-bottom: 1px solid var(--line); }
 .categories-intro-head { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
-.category-note { color: var(--muted); font-size: 12px; letter-spacing: 0.14em; }
-.categories-intro h1 { margin: 16px 0 14px; font-family: "STKaiti", "KaiTi", serif; font-size: clamp(2.9rem, 6.4vw, 5.4rem); font-weight: 400; line-height: .98; }
-.categories-intro p { max-width: 560px; margin: 0; color: var(--muted); font-family: "STSong", serif; font-size: 17px; line-height: 1.9; }
+.category-note { color: rgba(82, 102, 94, 0.84); font-size: 13px; letter-spacing: 0.1em; }
+.categories-intro h1 { margin: 16px 0 14px; font-family: var(--font-display); font-size: clamp(2.9rem, 6.4vw, 5.4rem); font-weight: 400; line-height: .98; }
+.categories-intro p { max-width: 560px; margin: 0; color: var(--muted); font-family: var(--font-sans); font-size: 17px; line-height: 1.9; }
 .categories-intro h1,
 .categories-intro p,
 .categories-intro .overview-kicker,
@@ -1561,12 +1742,12 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
 .theme-card { display: flex; flex-direction: column; padding: 26px 24px 22px; border: 1px solid rgba(82,102,94,.22); background: rgba(255,253,246,.34); }
 .theme-card-head { display: flex; align-items: baseline; gap: 14px; padding-bottom: 18px; border-bottom: 1px solid rgba(82,102,94,.14); }
 .theme-card-index { color: #b09261; font: 13px Georgia, serif; letter-spacing: .12em; }
-.theme-card-title { margin: 0; font-family: "STSong", serif; font-size: 21px; font-weight: 500; letter-spacing: .04em; }
+.theme-card-title { margin: 0; font-family: var(--font-serif-title); font-size: 21px; font-weight: 500; letter-spacing: .04em; }
 .theme-entry-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 18px; margin-top: 16px; }
-.theme-entry-grid a { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid rgba(82,102,94,.14); color: var(--muted); font-size: 13px; text-decoration: none; transition: color 180ms ease; }
+.theme-entry-grid a { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid rgba(82,102,94,.14); color: rgba(82, 102, 94, 0.84); font-size: 14px; font-weight: 500; text-decoration: none; transition: color 180ms ease; }
 .theme-entry-grid a:hover { color: var(--ink); }
 .theme-entry-grid a span { color: #b09261; font-size: 10px; }
-.theme-card-enter { align-self: flex-start; margin-top: 20px; padding: 9px 18px; border: 1px solid rgba(82,102,94,.28); color: var(--ink); font-size: 12px; letter-spacing: .08em; text-decoration: none; transition: color 180ms ease, background 180ms ease; }
+.theme-card-enter { align-self: flex-start; margin-top: 20px; padding: 9px 18px; border: 1px solid rgba(82,102,94,.28); color: var(--ink); font-size: 13px; font-weight: 500; letter-spacing: .06em; text-decoration: none; transition: color 180ms ease, background 180ms ease; }
 .theme-card-enter:hover { color: var(--paper); background: var(--ink); }
 
 /* Homepage and category pages: deepen supporting type so it reads over the artwork. */
@@ -1586,30 +1767,44 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
 .overview-page .season-button:hover,
 .overview-page .season-button.is-active { color: #2b453a; }
 .overview-page .category-item { color: rgba(48, 68, 58, 0.94); }
+/* 卡片标题与分类页统一用较柔的绿，避免加粗后发黑发硬 */
+.overview-page .category-copy strong { color: #3f6258; }
 .overview-page .category-item:hover,
 .overview-page .category-item-active { color: #2b453a; }
 .overview-page .category-copy small { color: rgba(61, 83, 72, 0.8); }
 .overview-page .overview-carousel-meta { color: rgba(61, 83, 72, 0.92); }
-.categories-page .theme-card-title { color: #2f473d; }
-.categories-page .theme-entry-grid a { color: rgba(56, 76, 66, 0.9); }
+.categories-page .theme-card-title { color: #3f6258; }
+.categories-page .theme-entry-grid a { color: rgba(63, 98, 88, 0.88); }
 .categories-page .theme-entry-grid a:hover { color: #2b453a; }
-.categories-page .theme-card-enter { color: #2f473d; border-color: rgba(47, 71, 61, 0.34); }
+.categories-page .theme-card-enter { color: #3f6258; border-color: rgba(63, 98, 88, 0.32); }
 .overview-page .overview-footer,
 .categories-page .overview-footer { color: rgba(61, 83, 72, 0.72); }
+
+/* 导航已有 9 个入口，中等宽度先收紧字距与栏距，避免与页码挤在一起 */
+@media (max-width: 1180px) and (min-width: 761px) {
+  .site-nav { gap: 11px; padding-left: 14px; }
+  .site-nav a { font-size: 12px; letter-spacing: 0.02em; }
+  .overview-header .edition { flex-basis: clamp(150px, 20vw, 200px); width: clamp(150px, 20vw, 200px); font-size: 9px; }
+}
 
 @media (max-width: 760px) {
   .minimal-header, .overview-header { gap: 12px; padding: 0 20px; }
   .minimal-header .edition, .overview-header .edition { display: none; }
-  .site-nav { gap: 12px; padding-left: 0; }
+  .site-nav { gap: 10px; padding-left: 0; }
+  .site-nav a { font-size: 12px; letter-spacing: 0.02em; }
   .categories-intro, .category-groups { width: min(100% - 40px, 1120px); }
   .categories-intro { padding: 7vh 0 4vh; }
   .category-groups { padding: 34px 0 7vh; }
   .category-themes { grid-template-columns: 1fr; }
 }
 
+@media (max-width: 640px) {
+  .brand-name { display: none; }
+}
+
 @media (max-width: 420px) {
-  .site-nav { gap: 9px; }
-  .site-nav a, .overview-header .site-nav a { font-size: 11px; letter-spacing: 0.02em; }
+  .site-nav { gap: 8px; }
+  .site-nav a, .overview-header .site-nav a { font-size: 11px; letter-spacing: 0.01em; }
   .brand-name { display: none; }
 }
 
@@ -1640,6 +1835,8 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
 .scene-copy,
 .scene-copy p,
 .scene-copy .location,
+.scene-link,
+.scene-calendar,
 .caption,
 .drawer-links button,
 .drawer-links button strong {
@@ -1714,26 +1911,27 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
 }
 
 .overview-carousel-meta strong {
-  font-family: "STSong", "Songti SC", serif;
+  font-family: var(--font-serif-title);
   font-size: 22px;
-  font-weight: 400;
-  letter-spacing: 0.08em;
+  font-weight: 500;
+  letter-spacing: 0.06em;
 }
 
 .season-filter {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 18px;
+  gap: 10px 18px;
   width: min(1180px, calc(100% - 84px));
   margin: 0 auto 12px;
   color: rgba(82, 102, 94, 0.58);
 }
 
 .season-label {
-  margin-right: auto;
-  color: #a68d61;
-  font-family: "STSong", "Songti SC", serif;
+  color: #8d7444;
+  font-family: var(--font-sans);
   font-size: 15px;
+  font-weight: 500;
 }
 
 .season-button {
@@ -1743,13 +1941,58 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
   background: transparent;
   color: currentColor;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .season-button:hover,
 .season-button.is-active {
   color: #3f6258;
   border-bottom-color: #a68d61;
+}
+
+.month-track {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 11px;
+  margin-right: auto;
+}
+
+.month-button[data-month="0"] {
+  margin-right: 5px;
+  padding-right: 12px;
+  border-right: 1px solid rgba(82, 102, 94, 0.16);
+}
+
+.month-summary {
+  margin: 0;
+  color: rgba(82, 102, 94, 0.82);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.month-map-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 4px 0;
+  color: #8d7444;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 200ms ease;
+}
+
+.month-map-link span {
+  display: inline-block;
+  transition: transform 200ms ease;
+}
+
+.month-map-link:hover span {
+  transform: translateX(3px);
 }
 
 .category-item.is-visited .category-number::after {
@@ -1773,6 +2016,19 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
   width: min(1180px, calc(100% - 84px));
   margin: 0 auto;
   border-top: 1px solid rgba(82, 102, 94, 0.14);
+}
+
+/* 关键：作者样式里的 display 会覆盖 UA 的 [hidden]，必须显式声明才能让年历筛选生效 */
+.category-item[hidden] {
+  display: none;
+}
+
+/* 筛选后条目重新排布，去掉奇偶分栏的错位装饰 */
+.category-guide.is-filtered .category-item,
+.category-guide.is-filtered .category-item:nth-child(odd),
+.category-guide.is-filtered .category-item:nth-child(even) {
+  margin-right: 0;
+  border-left: 0;
 }
 
 .category-item {
@@ -1812,7 +2068,7 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
 
 .category-number {
   color: #a68d61;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-latin);
   font-size: 11px;
   letter-spacing: 0.14em;
 }
@@ -1826,16 +2082,17 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
 .category-copy strong {
   overflow-wrap: anywhere;
   color: currentColor;
-  font-family: "STSong", "Songti SC", serif;
-  font-size: 18px;
-  font-weight: 400;
-  letter-spacing: 0.08em;
+  font-family: var(--font-sans);
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
 .category-copy small {
-  color: rgba(82, 102, 94, 0.52);
-  font-size: 11px;
-  letter-spacing: 0.08em;
+  color: rgba(82, 102, 94, 0.74);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
 }
 
 .category-arrow,
@@ -1849,7 +2106,7 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
   width: min(1180px, calc(100% - 84px));
   margin: 4vh auto 20px;
   color: rgba(82, 102, 94, 0.48);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-latin);
   font-size: 10px;
   letter-spacing: 0.16em;
 }
@@ -1885,9 +2142,9 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
 .subpage-inner > p {
   max-width: 88%;
   margin-top: 16px;
-  color: rgba(46, 67, 58, 0.86);
-  font-size: 13px;
-  line-height: 1.75;
+  color: rgba(46, 67, 58, 0.9);
+  font-size: 14px;
+  line-height: 1.78;
 }
 
 .subpage-content {
@@ -1898,8 +2155,8 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
 }
 
 .subpage-content p {
-  font-size: 13px;
-  line-height: 1.76;
+  font-size: 14px;
+  line-height: 1.8;
   border-left-color: rgba(143, 116, 72, 0.5);
 }
 
@@ -1911,10 +2168,11 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
   display: flex;
   align-items: center;
   gap: 10px;
-  color: rgba(82, 102, 94, 0.68);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 10px;
-  letter-spacing: 0.08em;
+  color: rgba(82, 102, 94, 0.84);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
 }
 
 .subpage-scrubber input {
@@ -1953,8 +2211,9 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
     font-size: 18px;
   }
 
+  /* 五个字要在一行内放下：按 (100vw - 60px) / 5.4 反算，留出约 10% 余量 */
   .overview-intro h1 {
-    font-size: clamp(4rem, 20vw, 6rem);
+    font-size: clamp(2.6rem, 14.5vw, 5rem);
   }
 
   .overview-intro p {
@@ -2097,7 +2356,7 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
 .guide-intro h1 {
   margin: 16px 0 14px;
   color: #3f6258;
-  font-family: "STKaiti", "KaiTi", serif;
+  font-family: var(--font-display);
   font-size: clamp(3rem, 6.4vw, 5.4rem);
   font-weight: 400;
   letter-spacing: 0.06em;
@@ -2108,7 +2367,7 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
   max-width: 620px;
   margin: 0;
   color: #3d5348;
-  font-family: "STSong", "Songti SC", serif;
+  font-family: var(--font-sans);
   font-size: 17px;
   line-height: 1.9;
 }
@@ -2142,7 +2401,7 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
 
 .guide-route-kicker {
   color: #8d7444;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-latin);
   font-size: 11px;
   letter-spacing: 0.16em;
 }
@@ -2150,18 +2409,18 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
 .guide-route-head h2 {
   margin: 8px 0 0;
   color: #2f473d;
-  font-family: "STSong", "Songti SC", serif;
+  font-family: var(--font-serif-title);
   font-size: clamp(1.8rem, 3vw, 2.8rem);
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: 0.05em;
 }
 
 .guide-route-head p {
   max-width: 430px;
   margin: 0 0 4px;
-  color: rgba(61, 83, 72, 0.88);
-  font-family: "STSong", "Songti SC", serif;
-  font-size: 14px;
+  color: rgba(61, 83, 72, 0.92);
+  font-family: var(--font-sans);
+  font-size: 15px;
   line-height: 1.8;
 }
 
@@ -2190,7 +2449,7 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
 
 .guide-route-index {
   color: #8d7444;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-latin);
   font-size: 12px;
   letter-spacing: 0.12em;
 }
@@ -2198,7 +2457,7 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
 .guide-route-card h3 {
   margin: 0;
   color: #2f473d;
-  font-family: "STSong", "Songti SC", serif;
+  font-family: var(--font-serif-title);
   font-size: 21px;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -2218,8 +2477,9 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
 
 .guide-route-meta dt {
   color: #8d7444;
-  font-size: 11px;
-  letter-spacing: 0.08em;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
 }
 
 .guide-route-meta dd {
@@ -2231,10 +2491,10 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
 
 .guide-notice {
   margin: 24px 0 0;
-  color: rgba(61, 83, 72, 0.68);
-  font-size: 11px;
-  line-height: 1.7;
-  letter-spacing: 0.04em;
+  color: rgba(61, 83, 72, 0.82);
+  font-size: 12.5px;
+  line-height: 1.75;
+  letter-spacing: 0.02em;
 }
 
 @media (max-width: 900px) {
@@ -2310,8 +2570,63 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
   padding: 10px 12px;
   color: #1d3329;
   background: rgba(255, 253, 246, 0.68);
-  font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif;
-  font-weight: 600;
+  font-family: var(--font-sans);
+  font-weight: 500;
   line-height: 1.82;
   text-shadow: none;
+}
+
+/* ---------- 首页 / 分类页：给正文加一层很浅的纸色地板 ---------- */
+/* 只加底色与柔光晕，不改字号字距；不透明度远低于两个主题页的底板。 */
+
+.overview-page,
+.categories-page {
+  --floor: rgba(255, 253, 246, 0.42);
+  --floor-halo: 0 0 20px 9px rgba(255, 253, 246, 0.34);
+}
+
+.overview-page .overview-copy,
+.overview-page .season-filter,
+.overview-page .category-guide,
+.categories-page .categories-intro {
+  border-radius: 4px;
+  background: var(--floor);
+  box-shadow: var(--floor-halo);
+}
+
+.overview-page .overview-copy {
+  padding: 26px 30px;
+}
+
+.overview-page .season-filter {
+  padding: 10px 18px;
+}
+
+/* 地板成为一层浮起的纸面后，原来的外缘分隔线会压到板边，去掉 */
+.overview-page .category-guide {
+  padding: 6px 22px;
+  border-top: 0;
+}
+
+.categories-page .categories-intro {
+  padding: 9vh 30px 5vh;
+  border-bottom: 0;
+}
+
+@media (max-width: 900px) {
+  .overview-page .overview-copy {
+    padding: 20px 18px;
+  }
+
+  .overview-page .season-filter {
+    padding: 9px 12px;
+  }
+
+  .overview-page .category-guide {
+    padding: 4px 12px;
+  }
+
+  .categories-page .categories-intro {
+    padding: 7vh 18px 4vh;
+  }
 }

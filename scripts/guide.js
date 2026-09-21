@@ -218,7 +218,6 @@ const districtColors = [
   '#ebf0e5',
 ];
 
-const mapSvg = document.querySelector('.atlas-map-art');
 const atlasMarkersElement = document.getElementById('atlasMarkers');
 const atlasDistricts = document.getElementById('atlasDistricts');
 const atlasDistrictLabels = document.getElementById('atlasDistrictLabels');
@@ -236,9 +235,23 @@ const atlasDetailFocus = document.getElementById('atlasDetailFocus');
 const atlasDetailLocation = document.getElementById('atlasDetailLocation');
 const atlasDetailAdvice = document.getElementById('atlasDetailAdvice');
 const atlasDetailQuote = document.getElementById('atlasDetailQuote');
+const atlasMonthInput = document.getElementById('atlasMonth');
+const atlasMonthOutput = document.getElementById('atlasMonthOutput');
+const atlasThemeChip = document.getElementById('atlasThemeChip');
+const atlasThemeChipLabel = document.getElementById('atlasThemeChipLabel');
+const atlasDetailEnter = document.getElementById('atlasDetailEnter');
+const atlasDetailElement = document.getElementById('atlasDetail');
+const pageParams = new URLSearchParams(location.search);
 
 let atlasMarkers = [];
 let activePlaceId = 'yulan-summer-palace';
+
+/** 地图筛选状态：主题类别 × 观赏月份 × 单一主题聚焦，三者取交集 */
+const atlasFilter = {
+  category: 'all',
+  month: JinghuaCalendar.normalizeMonth(pageParams.get('month')),
+  theme: atlasThemes[pageParams.get('theme')] ? pageParams.get('theme') : '',
+};
 
 function projectCoordinate([longitude, latitude]) {
   return [
@@ -419,6 +432,106 @@ function renderMarkers() {
   atlasMarkersElement.setAttribute('aria-busy', 'false');
 }
 
+function placeIsVisible(place) {
+  const theme = atlasThemes[place.theme];
+  if (atlasFilter.theme && place.theme !== atlasFilter.theme) return false;
+  if (atlasFilter.category !== 'all' && theme.category !== atlasFilter.category) return false;
+  if (atlasFilter.month && !JinghuaCalendar.isInMonth(place.theme, atlasFilter.month)) return false;
+  return true;
+}
+
+/** 把当前筛选与选中地点写进地址栏，便于刷新与分享 */
+function syncAtlasUrl() {
+  const params = new URLSearchParams();
+  if (activePlaceId) params.set('place', activePlaceId);
+  if (atlasFilter.month) params.set('month', String(atlasFilter.month));
+  if (atlasFilter.category !== 'all') params.set('category', atlasFilter.category);
+  if (atlasFilter.theme) params.set('theme', atlasFilter.theme);
+  try {
+    window.history.replaceState(null, '', `${location.pathname}?${params.toString()}`);
+  } catch (error) {
+    /* file:// 下 History API 不可用，跳过地址同步 */
+  }
+}
+
+function applyAtlasFilters() {
+  atlasLegendItems.forEach((item) => {
+    const active = atlasFilter.category === 'all'
+      ? item.dataset.atlasFilter === 'all'
+      : item.dataset.atlasFilter === atlasFilter.category;
+    item.classList.toggle('is-active', active);
+    item.setAttribute('aria-pressed', String(active));
+  });
+
+  atlasMonthInput.value = String(atlasFilter.month);
+
+  if (atlasFilter.theme) {
+    const focusTheme = atlasThemes[atlasFilter.theme];
+    atlasThemeChip.hidden = false;
+    atlasThemeChipLabel.textContent = `仅看 ${focusTheme.theme}`;
+    atlasThemeChip.setAttribute('aria-label', `清除「${focusTheme.theme}」主题筛选`);
+  } else {
+    atlasThemeChip.hidden = true;
+    atlasThemeChipLabel.textContent = '';
+    atlasThemeChip.removeAttribute('aria-label');
+  }
+
+  let visibleCount = 0;
+  atlasMarkers.forEach((marker) => {
+    const place = atlasPlaces.find((item) => item.id === marker.dataset.place);
+    const visible = placeIsVisible(place);
+    marker.hidden = !visible;
+    if (visible) visibleCount += 1;
+  });
+
+  atlasMonthOutput.textContent = `${JinghuaCalendar.monthText(atlasFilter.month)} · ${visibleCount} 处`;
+
+  if (!visibleCount) {
+    renderEmptyDetail();
+    return;
+  }
+
+  atlasDetailElement.classList.remove('is-empty');
+  const selected = atlasPlaces.find((item) => item.id === activePlaceId);
+  if (!selected || !placeIsVisible(selected)) {
+    const firstVisible = atlasMarkers.find((marker) => !marker.hidden);
+    if (firstVisible) selectPlace(firstVisible.dataset.place);
+  }
+}
+
+/** 类别 × 月份筛选后没有任何地点时的空态 */
+function renderEmptyDetail() {
+  activePlaceId = '';
+  atlasMarkers.forEach((marker) => {
+    marker.classList.remove('is-active');
+    marker.setAttribute('aria-pressed', 'false');
+  });
+
+  atlasDetailElement.classList.add('is-empty');
+  atlasDetailIndex.textContent = '—';
+  atlasDetailCategory.innerHTML = '<span>筛选结果</span>';
+  atlasDetailTitle.textContent = '这个组合下暂无推荐地点';
+  atlasDetailLead.textContent = '换一个月份或类别，可以看到更多可观赏的自然地点。';
+  atlasDetailQuote.textContent = '';
+  atlasDetailEnter.hidden = true;
+  syncAtlasUrl();
+}
+
+/** 支持 ?place=<地点> 与 ?theme=<主题> 两种深链 */
+function applyEntryParams() {
+  const requestedPlace = pageParams.get('place');
+  const requestedTheme = pageParams.get('theme');
+
+  if (requestedPlace && atlasPlaces.some((place) => place.id === requestedPlace)) {
+    activePlaceId = requestedPlace;
+    return;
+  }
+  if (atlasFilter.theme) {
+    const firstPlace = atlasPlaces.find((place) => place.theme === atlasFilter.theme);
+    if (firstPlace) activePlaceId = firstPlace.id;
+  }
+}
+
 function setCategoryIcon(theme) {
   atlasDetailCategory.innerHTML = `
     <svg aria-hidden="true"><use href="#atlas-icon-${theme.icon}"></use></svg>
@@ -451,52 +564,59 @@ function selectPlace(placeId) {
   atlasDetailLocation.textContent = place.location;
   atlasDetailAdvice.textContent = theme.viewingTip;
   atlasDetailQuote.textContent = theme.ode;
+
+  atlasDetailEnter.hidden = false;
+  atlasDetailEnter.href = JinghuaCalendar.speciesHref(place.theme);
+  atlasDetailEnter.innerHTML = `进入「${theme.theme}」主页<span aria-hidden="true">↗</span>`;
+
+  syncAtlasUrl();
 }
 
 function bindLegendControls() {
   atlasLegendItems.forEach((button) => {
     button.addEventListener('click', () => {
-      const filter = button.dataset.atlasFilter;
-      const isAll = filter === 'all';
-
-      atlasLegendItems.forEach((item) => {
-        const active = isAll
-          ? item.dataset.atlasFilter === 'all'
-          : item.dataset.atlasFilter === filter;
-        item.classList.toggle('is-active', active);
-        item.setAttribute('aria-pressed', String(active));
-      });
-
-      atlasMarkers.forEach((marker) => {
-        const place = atlasPlaces.find((item) => item.id === marker.dataset.place);
-        const theme = atlasThemes[place.theme];
-        marker.hidden = !isAll && theme.category !== filter;
-      });
-
-      const selected = atlasPlaces.find((item) => item.id === activePlaceId);
-      const selectedTheme = atlasThemes[selected.theme];
-      const selectedIsVisible = isAll || selectedTheme.category === filter;
-      if (!selectedIsVisible) {
-        const firstVisible = atlasMarkers.find((marker) => !marker.hidden);
-        if (firstVisible) selectPlace(firstVisible.dataset.place);
-      }
+      atlasFilter.category = button.dataset.atlasFilter;
+      atlasFilter.theme = '';
+      applyAtlasFilters();
     });
   });
+
+  atlasMonthInput.addEventListener('input', () => {
+    atlasFilter.month = JinghuaCalendar.normalizeMonth(atlasMonthInput.value);
+    applyAtlasFilters();
+  });
+
+  atlasThemeChip.addEventListener('click', () => {
+    atlasFilter.theme = '';
+    atlasFilter.category = 'all';
+    applyAtlasFilters();
+  });
+}
+
+/** 优先用内置脚本里的行政区数据；万一脚本没载入，再退回请求 geojson。
+ *  内置是为了避免 file:// 打开时 fetch 失败，导致底图整块空白。 */
+async function loadDistricts() {
+  if (window.BeijingDistricts && window.BeijingDistricts.features) return window.BeijingDistricts;
+  const response = await fetch(new URL('assets/beijing-districts.geojson', document.baseURI));
+  if (!response.ok) throw new Error(`Map data request failed: ${response.status}`);
+  return response.json();
 }
 
 async function initializeAtlas() {
   try {
-    const response = await fetch(new URL('assets/beijing-districts.geojson', document.baseURI));
-    if (!response.ok) throw new Error(`Map data request failed: ${response.status}`);
-    const geojson = await response.json();
+    const geojson = await loadDistricts();
     renderDistricts(geojson.features);
   } catch (error) {
-    mapSvg.classList.add('has-map-error');
+    // 用页面上的真实元素提示；伪元素对 <svg> 不生效，写了也不会显示
+    const frame = document.querySelector('.atlas-map-frame');
+    if (frame) frame.classList.add('has-map-error');
     console.error(error);
   }
 
   renderMarkers();
   bindLegendControls();
+  applyEntryParams();
+  applyAtlasFilters();
   selectPlace(activePlaceId);
 }
 

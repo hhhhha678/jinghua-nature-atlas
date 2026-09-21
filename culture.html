@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="assets/icon-leaf.svg" type="image/svg+xml" />
+    <meta name="description" content="京华自然 · 自然文脉：玉兰、月季、二月兰、芦苇、雨燕、秋沙鸭、银杏、古柏、香山红叶、永定河的诗文、名物与延伸阅读。" />
+    <title>自然文脉 · 京华自然</title>
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/topics.css" />
+    <link rel="stylesheet" href="styles/motion.css" />
+  </head>
+  <body class="topic-body">
+    <!-- 头部放在滚动容器之外：滚动条因此从导航栏下方开始，与「观赏攻略」一致 -->
+    <header class="overview-header">
+      <a class="brand" href="index.html" aria-label="京华自然首页">
+        <span class="brand-mark">京</span>
+        <span class="brand-name">京华自然</span>
+      </a>
+      <nav class="site-nav" aria-label="主导航">
+        <a href="index.html">首页</a>
+        <a href="categories.html?group=1">花木</a>
+        <a href="categories.html?group=2">湿地</a>
+        <a href="categories.html?group=3">鸟类</a>
+        <a href="categories.html?group=4">古树</a>
+        <a href="categories.html?group=5">山地</a>
+        <a href="guide.html">观赏攻略</a>
+        <a class="is-active" href="culture.html" aria-current="page">自然文脉</a>
+        <a href="history.html">发展之路</a>
+      </nav>
+      <span class="edition">BEIJING NATURE CHRONICLE / CULTURAL THREADS</span>
+    </header>
+
+    <main class="topic-page">
+      <section class="topic-intro">
+        <span class="overview-kicker">京华自然志 · 自然文脉</span>
+        <h1>一株草木，<br />也是一段被反复书写的记忆</h1>
+        <p>十个主题各自带着诗句、名物与书目。这里把古人的句子、今人的记述，与北京这座城市对它们的记忆放在一起——读完之后，再看一次花，看到的会更多一点。</p>
+      </section>
+
+      <nav class="topic-tabs" id="topicTabs" aria-label="选择主题"></nav>
+
+      <section class="topic-content" id="topicContent" aria-live="polite"></section>
+
+      <footer class="overview-footer">
+        <span>BEIJING / NATURE / MEMORY</span>
+        <span>04 — CULTURE</span>
+      </footer>
+    </main>
+
+    <script src="scripts/theme-calendar.js"></script>
+    <script src="scripts/culture-data.js"></script>
+    <script src="scripts/culture.js"></script>
+    <script src="scripts/topic-rail.js"></script>
+    <script src="scripts/motion.js"></script>
+  </body>
+</html>

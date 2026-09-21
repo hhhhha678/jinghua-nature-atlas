@@ -79,8 +79,8 @@ document.title = `${group.title} · 京华自然`;
 document.querySelectorAll('#categoryNav [data-group]').forEach((link) => {
   link.classList.toggle('is-active', Number(link.dataset.group) === groupIndex + 1);
 });
-document.getElementById('categoryEdition').textContent = `BEIJING NATURAL ATLAS / ${pad(groupIndex + 1)} CATEGORIES`;
-document.getElementById('categoryKicker').textContent = `北京自然图鉴 · ${pad(groupIndex + 1)}`;
+document.getElementById('categoryEdition').textContent = `BEIJING NATURE CHRONICLE / ${pad(groupIndex + 1)} CATEGORIES`;
+document.getElementById('categoryKicker').textContent = `京华自然志 · ${pad(groupIndex + 1)}`;
 document.getElementById('categoryNote').textContent = group.note;
 document.getElementById('categoryTitle').textContent = group.title;
 document.getElementById('categoryLead').textContent = group.lead;

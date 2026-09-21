@@ -143,7 +143,9 @@ const base = d.base === '' ? '' : `material/${speciesSlug}/`;
 const assetUrl = (filename) => new URL(filename.includes('/') ? `material/${filename}` : `${base}${filename}`, document.baseURI).href;
 
 document.title = `${d.name} · 京华自然`;
-document.querySelector('.edition').textContent = `NATURAL MEMORY / ${String(Object.keys(SPECIES).indexOf(speciesSlug) + 3).padStart(2, '0')}`;
+// 编号取全站统一的主题序号（01–10），不再按 SPECIES 的声明顺序推
+const themeMeta = JinghuaCalendar.theme(speciesSlug);
+document.querySelector('.edition').textContent = `BEIJING NATURE CHRONICLE / ${themeMeta ? themeMeta.index : '--'}`;
 document.querySelector('.location').textContent = d.loc;
 document.querySelector('.scene-copy h1').textContent = d.name;
 document.querySelector('.scene-copy p').textContent = d.desc;
@@ -151,6 +153,8 @@ document.querySelector('.caption').textContent = d.latin;
 document.querySelector('.drawer-heading span').textContent = `${d.name}分节`;
 document.querySelector('.drawer-heading strong').textContent = d.name;
 document.querySelector('.drawer-place').textContent = `北京 · ${d.name}分类`;
+
+JinghuaCalendar.mountSpeciesLinks(speciesSlug);
 
 const stageHero = assetUrl(d.hero);
 const stageCard = assetUrl(d.card);
@@ -295,16 +299,5 @@ els.scrub.addEventListener('input', () => {
 scene.classList.add('is-colored', 'is-open');
 document.getElementById('detailDrawer').setAttribute('aria-hidden', 'false');
 
-const exhibitionOrder = ['yueji', 'luwei', 'yuyan', 'zhonghuaqiushaya', 'yinxing', 'cebai', 'xiangshanhongye', 'yongdinghe'];
-if (localStorage.getItem('jinghua-exhibition') === speciesSlug) {
-  window.setTimeout(() => {
-    const nextSlug = exhibitionOrder[exhibitionOrder.indexOf(speciesSlug) + 1];
-    if (nextSlug) {
-      localStorage.setItem('jinghua-exhibition', nextSlug);
-      window.location.href = `${nextSlug}.html`;
-      return;
-    }
-    localStorage.removeItem('jinghua-exhibition');
-    window.location.href = 'index.html';
-  }, 6200);
-}
+// 展览模式：仅当本标签页主动开启过巡展时才安排跳转，且用户一有操作即取消
+JinghuaCalendar.scheduleExhibitionAdvance(speciesSlug);

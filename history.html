@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="assets/icon-leaf.svg" type="image/svg+xml" />
+    <meta name="description" content="京华自然 · 发展之路：玉兰、月季、二月兰、芦苇、北京雨燕、中华秋沙鸭、银杏、侧柏、香山红叶、永定河在北京的时间线。" />
+    <title>发展之路 · 京华自然</title>
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/topics.css" />
+    <link rel="stylesheet" href="styles/motion.css" />
+  </head>
+  <body class="topic-body">
+    <!-- 头部放在滚动容器之外：滚动条因此从导航栏下方开始，与「观赏攻略」一致 -->
+    <header class="overview-header">
+      <a class="brand" href="index.html" aria-label="京华自然首页">
+        <span class="brand-mark">京</span>
+        <span class="brand-name">京华自然</span>
+      </a>
+      <nav class="site-nav" aria-label="主导航">
+        <a href="index.html">首页</a>
+        <a href="categories.html?group=1">花木</a>
+        <a href="categories.html?group=2">湿地</a>
+        <a href="categories.html?group=3">鸟类</a>
+        <a href="categories.html?group=4">古树</a>
+        <a href="categories.html?group=5">山地</a>
+        <a href="guide.html">观赏攻略</a>
+        <a href="culture.html">自然文脉</a>
+        <a class="is-active" href="history.html" aria-current="page">发展之路</a>
+      </nav>
+      <span class="edition">BEIJING NATURE CHRONICLE / COURSE OF TIME</span>
+    </header>
+
+    <main class="topic-page">
+      <section class="topic-intro">
+        <span class="overview-kicker">京华自然志 · 发展之路</span>
+        <h1>它们不是一直都在这里的</h1>
+        <p>今天看起来理所当然的城市自然，其实是被一次次栽种、保护、修复和重新发现累积出来的。每个主题都有一条属于自己的时间线，从最早的记载走到最近一次变化。</p>
+      </section>
+
+      <nav class="topic-tabs" id="topicTabs" aria-label="选择主题"></nav>
+
+      <section class="topic-content" id="topicContent" aria-live="polite"></section>
+
+      <footer class="overview-footer">
+        <span>BEIJING / NATURE / MEMORY</span>
+        <span>05 — CHRONOLOGY</span>
+      </footer>
+    </main>
+
+    <script src="scripts/theme-calendar.js"></script>
+    <script src="scripts/history-data.js"></script>
+    <script src="scripts/history.js"></script>
+    <script src="scripts/topic-rail.js"></script>
+    <script src="scripts/motion.js"></script>
+  </body>
+</html>

@@ -51,7 +51,7 @@
   max-width: 720px;
   margin: 12px 0 0;
   color: #3f6258;
-  font-family: "STKaiti", "KaiTi", serif;
+  font-family: var(--font-display);
   font-size: clamp(2.6rem, 4vw, 3.7rem);
   font-weight: 400;
   letter-spacing: 0.05em;
@@ -62,8 +62,8 @@
   max-width: 430px;
   margin: 0 0 5px;
   color: #3d5348;
-  font-family: "STSong", "Songti SC", serif;
-  font-size: 15px;
+  font-family: var(--font-sans);
+  font-size: 16px;
   line-height: 1.85;
 }
 
@@ -96,9 +96,10 @@
 
 .atlas-legend-title {
   margin-right: 4px;
-  color: rgba(61, 83, 72, 0.72);
-  font-size: 11px;
-  letter-spacing: 0.14em;
+  color: rgba(61, 83, 72, 0.86);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
 }
 
 .atlas-legend-item {
@@ -109,10 +110,11 @@
   padding: 6px 10px;
   border: 1px solid rgba(82, 102, 94, 0.18);
   background: rgba(255, 253, 246, 0.36);
-  color: rgba(61, 83, 72, 0.7);
+  color: rgba(61, 83, 72, 0.86);
   cursor: pointer;
-  font-size: 11px;
-  letter-spacing: 0.06em;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   transition: color 180ms ease, border-color 180ms ease, background-color 180ms ease;
 }
 
@@ -136,6 +138,65 @@
 
 .atlas-legend-all {
   padding: 0 2px;
+}
+
+/* 作者样式里的 display 会覆盖 UA 的 [hidden]，显式声明才能让筛选真正生效 */
+.atlas-legend-item[hidden] {
+  display: none;
+}
+
+.atlas-month {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 10px;
+  margin-left: 8px;
+  padding: 5px 12px;
+  border: 1px solid rgba(82, 102, 94, 0.18);
+  background: rgba(255, 253, 246, 0.36);
+}
+
+.atlas-month-label {
+  color: #8d7444;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+
+.atlas-month-range {
+  width: 148px;
+  margin: 0;
+  accent-color: #7d9367;
+  cursor: pointer;
+}
+
+.atlas-month-output {
+  min-width: 72px;
+  color: rgba(61, 83, 72, 0.92);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.atlas-theme-chip {
+  gap: 8px;
+  border-color: rgba(141, 116, 68, 0.42);
+  background: rgba(166, 141, 97, 0.16);
+  color: #6d5a33;
+}
+
+.atlas-theme-chip span:last-child {
+  color: #8d7444;
+  font-size: 12px;
+}
+
+.atlas-theme-chip:hover {
+  border-color: rgba(141, 116, 68, 0.68);
+  color: #2f473d;
+  background: rgba(166, 141, 97, 0.24);
 }
 
 .atlas-map-frame {
@@ -188,13 +249,14 @@
 }
 
 .atlas-district-label {
-  fill: rgba(45, 65, 56, 0.68);
+  fill: rgba(45, 65, 56, 0.72);
   stroke: rgba(247, 244, 235, 0.92);
   stroke-width: 4;
   paint-order: stroke fill;
-  font-family: "STSong", "Songti SC", serif;
-  font-size: 16px;
-  letter-spacing: 0.08em;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   text-anchor: middle;
   dominant-baseline: middle;
 }
@@ -237,8 +299,26 @@
   vector-effect: non-scaling-stroke;
 }
 
-.atlas-map-art.has-map-error::after {
-  content: "地图数据暂时无法载入";
+/* 底图取不到数据时的可见提示。
+   注意：伪元素对 <svg> 元素不生效，所以这里用页面上的真实元素，不能再写成 ::after。 */
+.atlas-map-error {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 4;
+  display: none;
+  margin: 0;
+  padding: 10px 16px;
+  border-radius: 3px;
+  background: rgba(255, 253, 246, 0.92);
+  box-shadow: 0 10px 30px rgba(65, 78, 64, 0.12);
+  color: rgba(61, 83, 72, 0.92);
+  font-size: 13px;
+  transform: translate(-50%, -50%);
+}
+
+.atlas-map-frame.has-map-error .atlas-map-error {
+  display: block;
 }
 
 .atlas-mountain-mass {
@@ -289,8 +369,8 @@
 
 .atlas-region-label,
 .atlas-coordinate {
-  fill: rgba(82, 102, 94, 0.29);
-  font-family: "STSong", "Songti SC", serif;
+  fill: rgba(82, 102, 94, 0.36);
+  font-family: var(--font-latin);
   letter-spacing: 0.18em;
 }
 
@@ -299,7 +379,7 @@
 }
 
 .atlas-coordinate {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-latin);
   font-size: 10px;
   letter-spacing: 0.12em;
 }
@@ -352,8 +432,9 @@
   color: #2f473d;
   background: rgba(255, 253, 246, 0.94);
   box-shadow: 0 5px 16px rgba(65, 78, 64, 0.1);
-  font-size: 9px;
-  line-height: 1.3;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.35;
   opacity: 0;
   pointer-events: none;
   transform: translate(-50%, -4px);
@@ -397,7 +478,7 @@
   height: 54px;
   place-items: center;
   color: rgba(63, 98, 88, 0.72);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-latin);
   font-size: 11px;
 }
 
@@ -421,8 +502,8 @@
 .atlas-map-note {
   grid-area: note;
   margin: 12px 0 0;
-  color: rgba(61, 83, 72, 0.66);
-  font-size: 11px;
+  color: rgba(61, 83, 72, 0.8);
+  font-size: 12px;
   line-height: 1.7;
 }
 
@@ -449,7 +530,7 @@
 
 .atlas-detail-index {
   color: #8d7444;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-latin);
   font-size: 12px;
   letter-spacing: 0.18em;
 }
@@ -458,15 +539,16 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: rgba(61, 83, 72, 0.72);
-  font-size: 11px;
-  letter-spacing: 0.08em;
+  color: rgba(61, 83, 72, 0.86);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
 }
 
 .atlas-detail h2 {
   margin: 12px 0 0;
   color: #2f473d;
-  font-family: "STKaiti", "KaiTi", serif;
+  font-family: var(--font-display);
   font-size: clamp(1.8rem, 2.5vw, 2.35rem);
   font-weight: 400;
   letter-spacing: 0.04em;
@@ -474,10 +556,10 @@
 
 .atlas-detail-lead {
   margin: 10px 0 0;
-  color: rgba(45, 65, 56, 0.9);
-  font-family: "STSong", "Songti SC", serif;
-  font-size: 13px;
-  line-height: 1.7;
+  color: rgba(45, 65, 56, 0.94);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.78;
 }
 
 .atlas-detail-meta {
@@ -495,15 +577,16 @@
 
 .atlas-detail-meta dt {
   color: #8d7444;
-  font-size: 10px;
-  letter-spacing: 0.12em;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
 }
 
 .atlas-detail-meta dd {
   margin: 0;
   color: #30443a;
-  font-size: 12.5px;
-  line-height: 1.55;
+  font-size: 13.5px;
+  line-height: 1.6;
 }
 
 #atlasDetailLocation {
@@ -512,13 +595,49 @@
   background: transparent;
 }
 
+.atlas-detail-enter {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(141, 116, 68, 0.42);
+  color: #6d5a33;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  transition: color 180ms ease, border-color 180ms ease;
+}
+
+.atlas-detail-enter span {
+  color: #a68d61;
+}
+
+/* 作者样式里的 display 会覆盖 UA 的 [hidden]，空态与隐藏需显式声明 */
+.atlas-detail-enter[hidden] {
+  display: none;
+}
+
+.atlas-detail.is-empty .atlas-detail-meta,
+.atlas-detail.is-empty .atlas-detail-quote {
+  display: none;
+}
+
+.atlas-detail-enter:hover,
+.atlas-detail-enter:focus-visible {
+  border-bottom-color: #2f473d;
+  color: #2f473d;
+}
+
 .atlas-detail-quote {
   margin: auto 0 0;
   padding-top: 14px;
   border-top: 1px solid rgba(82, 102, 94, 0.14);
-  color: rgba(55, 74, 65, 0.86);
-  font-family: "STSong", "Songti SC", serif;
-  font-size: 12.5px;
+  color: rgba(55, 74, 65, 0.92);
+  font-family: var(--font-sans);
+  font-size: 13.5px;
   line-height: 1.82;
 }
 
@@ -527,9 +646,10 @@
   margin-bottom: 8px;
   color: #8d7444;
   content: "主题札记";
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 10px;
-  letter-spacing: 0.14em;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
 }
 
 @media (max-width: 1040px) {
@@ -560,8 +680,8 @@
 
   .atlas-detail-lead {
     margin-top: 8px;
-    font-size: 12px;
-    line-height: 1.6;
+    font-size: 13px;
+    line-height: 1.7;
   }
 
   .atlas-detail-meta {
@@ -571,8 +691,8 @@
   }
 
   .atlas-detail-meta dd {
-    font-size: 12px;
-    line-height: 1.45;
+    font-size: 13px;
+    line-height: 1.5;
   }
 
 }
@@ -627,7 +747,17 @@
 
   .atlas-legend-item {
     padding: 5px 8px;
-    font-size: 10px;
+    font-size: 11px;
+  }
+
+  .atlas-month {
+    width: 100%;
+    margin: 2px 0 0;
+  }
+
+  .atlas-month-range {
+    width: auto;
+    flex: 1;
   }
 
   .atlas-map-frame::after {
@@ -646,7 +776,7 @@
 
   .atlas-marker > span {
     max-width: 115px;
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .atlas-district-label {

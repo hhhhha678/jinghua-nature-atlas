@@ -7,6 +7,7 @@
     <title>观赏攻略 · 京华自然</title>
     <link rel="stylesheet" href="styles/main.css" />
     <link rel="stylesheet" href="styles/guide-map.css" />
+    <link rel="stylesheet" href="styles/motion.css" />
   </head>
   <body class="atlas-body">
     <header class="overview-header">
@@ -22,14 +23,16 @@
         <a href="categories.html?group=4">古树</a>
         <a href="categories.html?group=5">山地</a>
         <a class="is-active" href="guide.html">观赏攻略</a>
+        <a href="culture.html">自然文脉</a>
+        <a href="history.html">发展之路</a>
       </nav>
-      <span class="edition">BEIJING NATURAL ATLAS / VIEWING MAP</span>
+      <span class="edition">BEIJING NATURE CHRONICLE / VIEWING MAP</span>
     </header>
 
     <main class="atlas-page">
       <section class="atlas-intro">
         <div>
-          <span class="overview-kicker">北京自然图鉴 · 观赏地图</span>
+          <span class="overview-kicker">京华自然志 · 观赏地图</span>
           <h1>在城里，<br />寻找四季的自然入口</h1>
         </div>
         <p>春看花信穿过宫墙，夏听雨燕掠过城楼；<br />秋随色叶走向西山，冬在水岸等一阵远客。</p>
@@ -60,6 +63,15 @@
           <button class="atlas-legend-item is-active" type="button" data-atlas-filter="mountain" aria-pressed="true">
             <svg aria-hidden="true"><use href="#atlas-icon-mountain"></use></svg>
             <span>山地</span>
+          </button>
+          <label class="atlas-month" for="atlasMonth">
+            <span class="atlas-month-label">自然年历</span>
+            <input class="atlas-month-range" id="atlasMonth" type="range" min="0" max="12" step="1" value="0" />
+            <output class="atlas-month-output" id="atlasMonthOutput" for="atlasMonth">全年</output>
+          </label>
+          <button class="atlas-legend-item atlas-theme-chip" id="atlasThemeChip" type="button" hidden>
+            <span id="atlasThemeChipLabel"></span>
+            <span aria-hidden="true">×</span>
           </button>
         </div>
 
@@ -125,6 +137,8 @@
               <span>N</span>
               <i></i>
             </div>
+
+            <p class="atlas-map-error">底图数据未能载入，地点标记仍可查看。</p>
           </div>
         </div>
 
@@ -148,6 +162,7 @@
             <div><dt>具体位置</dt><dd id="atlasDetailLocation"></dd></div>
             <div><dt>观赏建议</dt><dd id="atlasDetailAdvice"></dd></div>
           </dl>
+          <a class="atlas-detail-enter" id="atlasDetailEnter" href="guide.html">进入物种主页<span aria-hidden="true">↗</span></a>
           <p class="atlas-detail-quote" id="atlasDetailQuote"></p>
         </aside>
         <p class="atlas-map-note">观赏时请保持距离，不投喂、不惊扰，并以园区现场开放信息为准。</p>
@@ -158,6 +173,9 @@
         <span>VIEWING MAP</span>
       </footer>
     </main>
+    <script src="scripts/beijing-districts.js"></script>
+    <script src="scripts/theme-calendar.js"></script>
     <script src="scripts/guide.js"></script>
+    <script src="scripts/motion.js"></script>
   </body>
 </html>

@@ -150,12 +150,8 @@ window.setTimeout(() => {
   scene.classList.add('is-colored');
 }, 2600);
 
-if (localStorage.getItem('jinghua-exhibition') === 'yulan') {
-  window.setTimeout(() => {
-    localStorage.setItem('jinghua-exhibition', 'eryuelan');
-    window.location.href = 'eryuelan.html';
-  }, 6200);
-}
+// 展览模式：仅当本标签页主动开启过巡展时才安排跳转，且用户一有操作即取消
+JinghuaCalendar.scheduleExhibitionAdvance('yulan');
 
 function closeSubpage() {
   if (document.documentElement.classList.contains('is-direct-entry')) {
@@ -221,3 +217,5 @@ document.addEventListener('keydown', (event) => {
     drawer.setAttribute('aria-hidden', 'true');
   }
 });
+
+JinghuaCalendar.mountSpeciesLinks('yulan');
