@@ -150,26 +150,35 @@ categoryItems.forEach((item) => {
   item.appendChild(badge);
 });
 
-todayButton.textContent = `今天 · ${JinghuaCalendar.todayLabel()}`;
-
+/* 背景轮播先起步。它是首页唯一的图像层，而且完全不依赖自然年历，
+   所以必须放在任何年历调用之前——否则年历一出问题，首页背景会一起变空白。 */
 startCarousel(0);
 
-monthButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    const month = JinghuaCalendar.normalizeMonth(button.dataset.month);
+/* 「今天的京华自然」初始化。
+   万一 theme-calendar.js 没就绪（被拦、加载失败、解析出错等），
+   这里退化成"全年"而不是让整段脚本中断，标题栏与主题列表照常可用。 */
+try {
+  todayButton.textContent = `今天 · ${JinghuaCalendar.todayLabel()}`;
+
+  monthButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const month = JinghuaCalendar.normalizeMonth(button.dataset.month);
+      rememberMonth(month);
+      applyMonth(month);
+    });
+  });
+
+  todayButton.addEventListener('click', () => {
+    const month = JinghuaCalendar.currentMonth();
     rememberMonth(month);
     applyMonth(month);
   });
-});
 
-todayButton.addEventListener('click', () => {
-  const month = JinghuaCalendar.currentMonth();
-  rememberMonth(month);
-  applyMonth(month);
-});
-
-/** 首屏对齐到当月（或本会话里用户自己选的月份） */
-applyMonth(readPreferredMonth());
+  /** 首屏对齐到当月（或本会话里用户自己选的月份） */
+  applyMonth(readPreferredMonth());
+} catch (error) {
+  console.error('自然年历初始化失败，首页退化为全年视图', error);
+}
 
 exhibitionMode.addEventListener('click', () => {
   exhibitionMode.classList.add('is-playing');

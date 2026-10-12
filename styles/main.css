@@ -1617,8 +1617,12 @@ html.is-direct-entry .subpage-panel.is-active {
     linear-gradient(0deg, rgba(246, 235, 218, 0.4), transparent 42%);
 }
 
+/* 首页是「固定满屏的背景轮播 + 浮在上面的内容块」的结构。
+   凡是需要盖在背景图之上的内容块，都必须在这里显式抬到 z-index 1；
+   少写一个，它就会掉到背景层下面被整块遮住。 */
 .overview-header,
 .overview-intro,
+.season-filter,
 .category-guide,
 .overview-footer {
   position: relative;
