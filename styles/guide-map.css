@@ -193,6 +193,37 @@
   font-size: 12px;
 }
 
+/* 「今天」按钮：把月份滑块一键拨回当前月份 */
+.atlas-today-chip {
+  gap: 6px;
+  border-color: rgba(166, 141, 97, 0.42);
+  background: rgba(255, 253, 246, 0.5);
+  color: rgba(109, 90, 51, 0.9);
+}
+
+.atlas-today-dot {
+  width: 5px;
+  height: 5px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  transition: background-color 180ms ease;
+}
+
+.atlas-today-chip:hover {
+  border-color: rgba(166, 141, 97, 0.72);
+  color: #6d5a33;
+}
+
+.atlas-today-chip.is-active {
+  border-color: rgba(141, 116, 68, 0.6);
+  background: rgba(166, 141, 97, 0.18);
+  color: #6d5a33;
+}
+
+.atlas-today-chip.is-active .atlas-today-dot {
+  background: currentColor;
+}
+
 .atlas-theme-chip:hover {
   border-color: rgba(141, 116, 68, 0.68);
   color: #2f473d;
@@ -226,6 +257,30 @@
 .atlas-map-frame::after {
   inset: 14px;
   border: 1px solid rgba(166, 141, 97, 0.2);
+}
+
+/* 平移/缩放的整体图层：底图与标记一起变换，所以引线和路线不会错位。
+   高度仍由里面的 SVG 撑开，画框不会塌。 */
+.atlas-map-layer {
+  position: relative;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+/* 只有放大之后才有可平移的余地，也才接管触摸手势 */
+.atlas-map-frame.is-zoomed {
+  cursor: grab;
+  touch-action: none;
+}
+
+.atlas-map-frame.is-panning {
+  cursor: grabbing;
+}
+
+/* 缩放过程中别让 marker 的 transform 过渡拖后腿 */
+.atlas-map-frame.is-transforming .atlas-marker,
+.atlas-map-frame.is-transforming .atlas-route-pin {
+  transition: none;
 }
 
 .atlas-map-art {
@@ -404,7 +459,10 @@
   color: #fffdf6;
   cursor: pointer;
   box-shadow: 0 4px 11px rgba(65, 78, 64, 0.2);
+  /* 反向缩放：图层放大了多少，marker 就缩回多少，屏幕上始终是自然大小。
+     前一行是不支持 calc() 除法的浏览器的兜底，避免 marker 全部塌到左上角。 */
   transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) scale(calc(1 / var(--map-zoom, 1)));
   transition: transform 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
 }
 
@@ -422,23 +480,51 @@
   stroke-width: 1.7;
 }
 
-.atlas-marker > span {
+/* 悬浮卡：挂在 marker 内部，跟着 marker 的反向缩放走，所以放大后也不会变形 */
+.atlas-marker-card {
   position: absolute;
-  top: calc(100% + 4px);
+  top: calc(100% + 7px);
   left: 50%;
+  display: grid;
   width: max-content;
-  max-width: 150px;
-  padding: 4px 7px;
+  max-width: 190px;
+  gap: 3px;
+  padding: 8px 11px 9px;
+  border: 1px solid rgba(82, 102, 94, 0.18);
   color: #2f473d;
-  background: rgba(255, 253, 246, 0.94);
-  box-shadow: 0 5px 16px rgba(65, 78, 64, 0.1);
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 1.35;
+  background: rgba(255, 253, 246, 0.97);
+  box-shadow: 0 10px 26px rgba(65, 78, 64, 0.16);
+  text-align: left;
   opacity: 0;
   pointer-events: none;
-  transform: translate(-50%, -4px);
+  transform: translate(-50%, -5px);
   transition: opacity 160ms ease, transform 180ms ease;
+}
+
+.atlas-marker-name {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.atlas-marker-meta {
+  color: rgba(82, 102, 94, 0.84);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.atlas-marker-time {
+  color: #8d7444;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.atlas-marker.is-in-route {
+  box-shadow: 0 0 0 3px rgba(166, 141, 97, 0.5), 0 4px 11px rgba(65, 78, 64, 0.2);
 }
 
 .atlas-marker:hover,
@@ -447,6 +533,7 @@
   z-index: 4;
   box-shadow: 0 10px 25px rgba(65, 78, 64, 0.28);
   transform: translate(-50%, -50%) scale(1.12);
+  transform: translate(-50%, -50%) scale(calc(1.12 / var(--map-zoom, 1)));
 }
 
 .atlas-marker::after {
@@ -455,9 +542,9 @@
   content: "";
 }
 
-.atlas-marker:hover > span,
-.atlas-marker:focus-visible > span,
-.atlas-marker.is-active > span {
+.atlas-marker:hover .atlas-marker-card,
+.atlas-marker:focus-visible .atlas-marker-card,
+.atlas-marker.is-active .atlas-marker-card {
   opacity: 1;
   transform: translate(-50%, 0);
 }
@@ -631,6 +718,273 @@
   color: #2f473d;
 }
 
+/* 详情面板底部的"加入半日路线"按钮 */
+.atlas-detail-route {
+  align-self: flex-start;
+  margin-top: 10px;
+  padding: 7px 13px;
+  border: 1px solid rgba(141, 116, 68, 0.42);
+  background: rgba(166, 141, 97, 0.12);
+  color: #6d5a33;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  transition: color 180ms ease, border-color 180ms ease, background-color 180ms ease;
+}
+
+.atlas-detail-route:hover:not(:disabled),
+.atlas-detail-route:focus-visible:not(:disabled) {
+  border-color: rgba(141, 116, 68, 0.74);
+  background: rgba(166, 141, 97, 0.24);
+  color: #2f473d;
+}
+
+.atlas-detail-route.is-added {
+  border-color: rgba(141, 116, 68, 0.68);
+  background: rgba(166, 141, 97, 0.26);
+}
+
+.atlas-detail-route:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+/* 作者样式里的 display 会覆盖 UA 的 [hidden] */
+.atlas-detail-route[hidden] {
+  display: none;
+}
+
+/* 半日路线条：站点可单独移除，右侧是总时长 */
+.atlas-route-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+  padding: 9px 14px;
+  border: 1px solid rgba(141, 116, 68, 0.32);
+  background: rgba(255, 253, 246, 0.58);
+  box-shadow: 0 8px 22px rgba(65, 78, 64, 0.06);
+}
+
+.atlas-route-bar[hidden] {
+  display: none;
+}
+
+.atlas-route-title {
+  color: #6d5a33;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+}
+
+.atlas-route-stops {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.atlas-route-stop button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border: 1px solid rgba(141, 116, 68, 0.34);
+  background: rgba(255, 253, 246, 0.82);
+  color: rgba(61, 83, 72, 0.92);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.atlas-route-stop button:hover,
+.atlas-route-stop button:focus-visible {
+  border-color: rgba(141, 116, 68, 0.72);
+  background: rgba(166, 141, 97, 0.18);
+}
+
+.atlas-route-stop-index {
+  color: #8d7444;
+  font-family: var(--font-latin);
+  font-size: 10px;
+}
+
+.atlas-route-stop-name {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.atlas-route-stop-x {
+  color: #8d7444;
+  font-size: 12px;
+}
+
+.atlas-route-total {
+  margin-left: auto;
+  color: rgba(61, 83, 72, 0.88);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.atlas-route-clear {
+  padding: 4px 11px;
+  border: 1px solid rgba(82, 102, 94, 0.24);
+  background: transparent;
+  color: rgba(61, 83, 72, 0.86);
+  cursor: pointer;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  transition: color 160ms ease, border-color 160ms ease;
+}
+
+.atlas-route-clear:hover,
+.atlas-route-clear:focus-visible {
+  border-color: rgba(63, 98, 88, 0.5);
+  color: #2f473d;
+}
+
+/* 引线与路线都画在底图坐标系里，跟着图层一起变换 */
+.atlas-annotations {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.atlas-annotation-route {
+  fill: none;
+  stroke: #a68d61;
+  stroke-width: 1.8;
+  stroke-dasharray: 7 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  opacity: 0;
+  transition: opacity 240ms ease;
+}
+
+.atlas-annotation-route.is-visible {
+  opacity: 0.9;
+}
+
+.atlas-annotation-leader {
+  stroke: rgba(141, 116, 68, 0.8);
+  stroke-width: 1.2;
+  stroke-dasharray: 4 4;
+  vector-effect: non-scaling-stroke;
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.atlas-annotation-leader.is-visible {
+  opacity: 1;
+}
+
+.atlas-district.is-focused {
+  stroke: rgba(141, 116, 68, 0.85);
+  stroke-width: 2.4;
+}
+
+/* 路线站点编号：零尺寸锚点 + 反向缩放，编号始终是自然大小 */
+.atlas-route-pins {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.atlas-route-pin {
+  position: absolute;
+  width: 0;
+  height: 0;
+  transform: none;
+  transform: scale(calc(1 / var(--map-zoom, 1)));
+  transform-origin: 0 0;
+}
+
+.atlas-route-pin i {
+  position: absolute;
+  top: -21px;
+  left: 7px;
+  display: grid;
+  width: 17px;
+  height: 17px;
+  place-items: center;
+  border: 1px solid rgba(255, 253, 246, 0.9);
+  border-radius: 50%;
+  background: #a68d61;
+  box-shadow: 0 3px 9px rgba(65, 78, 64, 0.26);
+  color: #fffdf6;
+  font-family: var(--font-latin);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.atlas-map-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 5;
+  display: flex;
+  gap: 6px;
+}
+
+.atlas-map-control {
+  display: grid;
+  min-width: 30px;
+  height: 30px;
+  place-items: center;
+  padding: 0 9px;
+  border: 1px solid rgba(82, 102, 94, 0.24);
+  background: rgba(255, 253, 246, 0.9);
+  color: #3f6258;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease;
+}
+
+.atlas-map-control:hover:not(:disabled),
+.atlas-map-control:focus-visible:not(:disabled) {
+  border-color: rgba(63, 98, 88, 0.5);
+  background: rgba(255, 253, 246, 1);
+  color: #2f473d;
+}
+
+.atlas-map-control:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.atlas-map-control-reset {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.atlas-map-hint {
+  position: absolute;
+  top: 16px;
+  left: 20px;
+  z-index: 4;
+  margin: 0;
+  color: rgba(61, 83, 72, 0.6);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+}
+
 .atlas-detail-quote {
   margin: auto 0 0;
   padding-top: 14px;
@@ -774,9 +1128,9 @@
     height: 7px;
   }
 
-  .atlas-marker > span {
-    max-width: 115px;
-    font-size: 10px;
+  .atlas-marker-card {
+    max-width: 150px;
+    padding: 7px 9px 8px;
   }
 
   .atlas-district-label {

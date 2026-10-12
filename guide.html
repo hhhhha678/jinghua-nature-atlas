@@ -69,6 +69,10 @@
             <input class="atlas-month-range" id="atlasMonth" type="range" min="0" max="12" step="1" value="0" />
             <output class="atlas-month-output" id="atlasMonthOutput" for="atlasMonth">全年</output>
           </label>
+          <button class="atlas-legend-item atlas-today-chip" id="atlasTodayChip" type="button">
+            <span class="atlas-today-dot" aria-hidden="true"></span>
+            <span id="atlasTodayChipLabel">今天</span>
+          </button>
           <button class="atlas-legend-item atlas-theme-chip" id="atlasThemeChip" type="button" hidden>
             <span id="atlasThemeChipLabel"></span>
             <span aria-hidden="true">×</span>
@@ -76,67 +80,84 @@
         </div>
 
         <div class="atlas-map-column">
-          <div class="atlas-map-frame">
-            <svg class="atlas-map-art" viewBox="0 0 1000 840" role="img" aria-label="北京市行政区与自然观赏地点分布图">
-              <defs>
-                <linearGradient id="atlasPaper" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="#f8f5ec" />
-                  <stop offset="0.52" stop-color="#eef2e5" />
-                  <stop offset="1" stop-color="#e8eee4" />
-                </linearGradient>
-                <linearGradient id="atlasMountain" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="#b8c8aa" stop-opacity="0.26" />
-                  <stop offset="1" stop-color="#809b86" stop-opacity="0.08" />
-                </linearGradient>
-                <linearGradient id="atlasRiver" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="#79a7b2" stop-opacity="0.2" />
-                  <stop offset="1" stop-color="#c4d7d4" stop-opacity="0.08" />
-                </linearGradient>
-                <filter id="atlasRough">
-                  <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="8" result="noise" />
-                  <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G" />
-                </filter>
-                <symbol id="atlas-icon-flower" viewBox="0 0 24 24">
-                  <circle cx="12" cy="8" r="3"></circle>
-                  <circle cx="8" cy="12" r="3"></circle>
-                  <circle cx="16" cy="12" r="3"></circle>
-                  <circle cx="12" cy="16" r="3"></circle>
-                  <circle cx="12" cy="12" r="2"></circle>
-                  <path d="M12 17v4"></path>
-                </symbol>
-                <symbol id="atlas-icon-wetland" viewBox="0 0 24 24">
-                  <path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 1.3 0 1.9-.5 2.5-1"></path>
-                  <path d="M2 12c.6.5 1.2 1 2.5 1C7 13 7 11 9.5 11c2.6 0 2.4 2 5 2 1.3 0 1.9-.5 2.5-1"></path>
-                  <path d="M2 18c.6.5 1.2 1 2.5 1C7 19 7 17 9.5 17c2.6 0 2.4 2 5 2 1.3 0 1.9-.5 2.5-1"></path>
-                </symbol>
-                <symbol id="atlas-icon-bird" viewBox="0 0 24 24">
-                  <path d="M16 7h.01"></path>
-                  <path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 20"></path>
-                  <path d="m20 7 2 .5-2 .5"></path>
-                  <path d="M10 18v3"></path>
-                  <path d="M14 17.75V21"></path>
-                  <path d="M7 18a6 6 0 0 0 3.84-10.61"></path>
-                </symbol>
-                <symbol id="atlas-icon-tree" viewBox="0 0 24 24">
-                  <path d="m17 14 3 3.3a1 1 0 0 1-.7 1.7H4.7a1 1 0 0 1-.7-1.7L7 14h-.3a1 1 0 0 1-.7-1.7L9 9h-.2A1 1 0 0 1 8 7.3L12 3l4 4.3a1 1 0 0 1-.8 1.7H15l3 3.3a1 1 0 0 1-.7 1.7H17Z"></path>
-                  <path d="M12 22v-3"></path>
-                </symbol>
-                <symbol id="atlas-icon-mountain" viewBox="0 0 24 24">
-                  <path d="m8 3 4 8 5-5 5 15H2L8 3z"></path>
-                </symbol>
-              </defs>
+          <div class="atlas-route-bar" id="atlasRouteBar" hidden>
+            <span class="atlas-route-title" id="atlasRouteTitle">半日路线</span>
+            <ol class="atlas-route-stops" id="atlasRouteStops"></ol>
+            <span class="atlas-route-total" id="atlasRouteTotal" aria-live="polite"></span>
+            <button class="atlas-route-clear" id="atlasRouteClear" type="button">清空路线</button>
+          </div>
 
-              <g class="atlas-districts" id="atlasDistricts"></g>
-              <g class="atlas-district-labels" id="atlasDistrictLabels"></g>
-              <text class="atlas-coordinate" x="58" y="806">BEIJING / 39°54′N · 116°24′E</text>
+          <div class="atlas-map-frame" id="atlasMapFrame">
+            <div class="atlas-map-layer" id="atlasMapLayer">
+              <svg class="atlas-map-art" viewBox="0 0 1000 840" role="img" aria-label="北京市行政区与自然观赏地点分布图">
+                <defs>
+                  <linearGradient id="atlasPaper" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#f8f5ec" />
+                    <stop offset="0.52" stop-color="#eef2e5" />
+                    <stop offset="1" stop-color="#e8eee4" />
+                  </linearGradient>
+                  <linearGradient id="atlasMountain" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#b8c8aa" stop-opacity="0.26" />
+                    <stop offset="1" stop-color="#809b86" stop-opacity="0.08" />
+                  </linearGradient>
+                  <linearGradient id="atlasRiver" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#79a7b2" stop-opacity="0.2" />
+                    <stop offset="1" stop-color="#c4d7d4" stop-opacity="0.08" />
+                  </linearGradient>
+                  <filter id="atlasRough">
+                    <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="8" result="noise" />
+                    <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G" />
+                  </filter>
+                  <symbol id="atlas-icon-flower" viewBox="0 0 24 24">
+                    <circle cx="12" cy="8" r="3"></circle>
+                    <circle cx="8" cy="12" r="3"></circle>
+                    <circle cx="16" cy="12" r="3"></circle>
+                    <circle cx="12" cy="16" r="3"></circle>
+                    <circle cx="12" cy="12" r="2"></circle>
+                    <path d="M12 17v4"></path>
+                  </symbol>
+                  <symbol id="atlas-icon-wetland" viewBox="0 0 24 24">
+                    <path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 1.3 0 1.9-.5 2.5-1"></path>
+                    <path d="M2 12c.6.5 1.2 1 2.5 1C7 13 7 11 9.5 11c2.6 0 2.4 2 5 2 1.3 0 1.9-.5 2.5-1"></path>
+                    <path d="M2 18c.6.5 1.2 1 2.5 1C7 19 7 17 9.5 17c2.6 0 2.4 2 5 2 1.3 0 1.9-.5 2.5-1"></path>
+                  </symbol>
+                  <symbol id="atlas-icon-bird" viewBox="0 0 24 24">
+                    <path d="M16 7h.01"></path>
+                    <path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 20"></path>
+                    <path d="m20 7 2 .5-2 .5"></path>
+                    <path d="M10 18v3"></path>
+                    <path d="M14 17.75V21"></path>
+                    <path d="M7 18a6 6 0 0 0 3.84-10.61"></path>
+                  </symbol>
+                  <symbol id="atlas-icon-tree" viewBox="0 0 24 24">
+                    <path d="m17 14 3 3.3a1 1 0 0 1-.7 1.7H4.7a1 1 0 0 1-.7-1.7L7 14h-.3a1 1 0 0 1-.7-1.7L9 9h-.2A1 1 0 0 1 8 7.3L12 3l4 4.3a1 1 0 0 1-.8 1.7H15l3 3.3a1 1 0 0 1-.7 1.7H17Z"></path>
+                    <path d="M12 22v-3"></path>
+                  </symbol>
+                  <symbol id="atlas-icon-mountain" viewBox="0 0 24 24">
+                    <path d="m8 3 4 8 5-5 5 15H2L8 3z"></path>
+                  </symbol>
+                </defs>
+
+                <g class="atlas-districts" id="atlasDistricts"></g>
+                <g class="atlas-district-labels" id="atlasDistrictLabels"></g>
+                <text class="atlas-coordinate" x="58" y="806">BEIJING / 39°54′N · 116°24′E</text>
             </svg>
 
-            <div class="atlas-markers" id="atlasMarkers" aria-busy="true"></div>
+              <div class="atlas-markers" id="atlasMarkers" aria-busy="true"></div>
+            </div>
 
             <div class="atlas-compass" aria-hidden="true">
               <span>N</span>
               <i></i>
             </div>
+
+            <div class="atlas-map-controls">
+              <button class="atlas-map-control" id="atlasZoomIn" type="button" aria-label="放大地图">+</button>
+              <button class="atlas-map-control" id="atlasZoomOut" type="button" aria-label="缩小地图">−</button>
+              <button class="atlas-map-control atlas-map-control-reset" id="atlasZoomReset" type="button" aria-label="重置地图视图">复位</button>
+            </div>
+
+            <p class="atlas-map-hint">拖拽平移 · Ctrl/⌘ + 滚轮缩放</p>
 
             <p class="atlas-map-error">底图数据未能载入，地点标记仍可查看。</p>
           </div>
@@ -163,6 +184,7 @@
             <div><dt>观赏建议</dt><dd id="atlasDetailAdvice"></dd></div>
           </dl>
           <a class="atlas-detail-enter" id="atlasDetailEnter" href="guide.html">进入物种主页<span aria-hidden="true">↗</span></a>
+          <button class="atlas-detail-route" id="atlasDetailRoute" type="button"></button>
           <p class="atlas-detail-quote" id="atlasDetailQuote"></p>
         </aside>
         <p class="atlas-map-note">观赏时请保持距离，不投喂、不惊扰，并以园区现场开放信息为准。</p>

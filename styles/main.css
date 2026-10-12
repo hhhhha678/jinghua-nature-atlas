@@ -1934,6 +1934,51 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
   font-weight: 500;
 }
 
+/* 「今天」印章：既是当前日期的提示，也是"回到本月"的按钮 */
+.today-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border: 1px solid rgba(166, 141, 97, 0.42);
+  border-radius: 999px;
+  background: rgba(255, 253, 246, 0.5);
+  color: rgba(109, 90, 51, 0.9);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  transition: border-color 200ms ease, background-color 200ms ease, color 200ms ease;
+}
+
+/* 印章前的实心点：看当月时是实心，切到别的月份后变成空心 */
+.today-stamp::before {
+  width: 5px;
+  height: 5px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: transparent;
+  content: "";
+  transition: background-color 200ms ease;
+}
+
+.today-stamp:hover {
+  border-color: rgba(166, 141, 97, 0.72);
+  color: #6d5a33;
+}
+
+.today-stamp.is-active {
+  background: rgba(166, 141, 97, 0.18);
+  border-color: rgba(141, 116, 68, 0.6);
+  color: #6d5a33;
+}
+
+.today-stamp.is-active::before {
+  background: currentColor;
+}
+
 .season-button {
   padding: 6px 2px;
   border: 0;
@@ -1948,6 +1993,13 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
 .season-button.is-active {
   color: #3f6258;
   border-bottom-color: #a68d61;
+}
+
+/* 当月的那个月份按钮改用实心下划线，和普通选中区分开 */
+.season-button.is-today {
+  border-bottom-color: #8d7444;
+  border-bottom-width: 2px;
+  color: #6d5a33;
 }
 
 .month-track {
@@ -2033,7 +2085,7 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
 
 .category-item {
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr);
+  grid-template-columns: 42px minmax(0, 1fr) auto;
   align-items: center;
   gap: 14px;
   min-height: 66px;
@@ -2093,6 +2145,44 @@ body:has(.categories-page) { overflow: auto; background: #eef1eb; }
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.04em;
+}
+
+/* 「本月」角标：主题条目网格的第三列，只有当月可赏的主题才出现 */
+.category-now {
+  display: none;
+  align-items: center;
+  padding: 2px 9px;
+  border: 1px solid rgba(166, 141, 97, 0.46);
+  border-radius: 999px;
+  background: rgba(166, 141, 97, 0.16);
+  color: #6d5a33;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+.category-item.is-current .category-now {
+  display: inline-flex;
+  animation: category-now-in 420ms ease both;
+}
+
+@keyframes category-now-in {
+  from {
+    opacity: 0;
+    transform: translateX(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .category-item.is-current .category-now {
+    animation: none;
+  }
 }
 
 .category-arrow,

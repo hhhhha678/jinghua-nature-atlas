@@ -239,19 +239,54 @@ const atlasMonthInput = document.getElementById('atlasMonth');
 const atlasMonthOutput = document.getElementById('atlasMonthOutput');
 const atlasThemeChip = document.getElementById('atlasThemeChip');
 const atlasThemeChipLabel = document.getElementById('atlasThemeChipLabel');
+const atlasTodayChip = document.getElementById('atlasTodayChip');
+const atlasTodayChipLabel = document.getElementById('atlasTodayChipLabel');
 const atlasDetailEnter = document.getElementById('atlasDetailEnter');
 const atlasDetailElement = document.getElementById('atlasDetail');
+const atlasDetailRoute = document.getElementById('atlasDetailRoute');
+const atlasMapFrame = document.getElementById('atlasMapFrame');
+const atlasMapLayer = document.getElementById('atlasMapLayer');
+const atlasZoomIn = document.getElementById('atlasZoomIn');
+const atlasZoomOut = document.getElementById('atlasZoomOut');
+const atlasZoomReset = document.getElementById('atlasZoomReset');
+const atlasRouteBar = document.getElementById('atlasRouteBar');
+const atlasRouteTitle = document.getElementById('atlasRouteTitle');
+const atlasRouteStops = document.getElementById('atlasRouteStops');
+const atlasRouteTotal = document.getElementById('atlasRouteTotal');
+const atlasRouteClear = document.getElementById('atlasRouteClear');
 const pageParams = new URLSearchParams(location.search);
 
 let atlasMarkers = [];
 let activePlaceId = 'yulan-summer-palace';
 
+/* 地图探索增强用到的状态：
+ *  · atlasPlaceLayout —— 每个地点在底图坐标系里的落点（含避让偏移），引线与路线都靠它
+ *  · districtShapes / districtAnchors —— 行政区多边形与中心点，用来画"地点属于哪个区"的引线
+ *  · atlasRoute —— 半日路线的站点顺序 */
+let atlasPlaceLayout = new Map();
+const districtShapes = new Map();
+const districtAnchors = new Map();
+const atlasRoute = [];
+const ATLAS_ROUTE_LIMIT = 4;
+
+/** 打开地图时的默认月份：
+ *  · 深链带了 month 就完全听它的（首页/物种页点过来都带）
+ *  · 只带了 theme 时保持"全年"，否则「某主题 × 当前月」很容易撞成空结果
+ *  · 什么都没带就落在当前月份 —— 打开地图就是"今天能看什么" */
+function initialAtlasMonth() {
+  if (pageParams.has('month')) return JinghuaCalendar.normalizeMonth(pageParams.get('month'));
+  if (atlasThemes[pageParams.get('theme')]) return 0;
+  return JinghuaCalendar.currentMonth();
+}
+
 /** 地图筛选状态：主题类别 × 观赏月份 × 单一主题聚焦，三者取交集 */
 const atlasFilter = {
   category: 'all',
-  month: JinghuaCalendar.normalizeMonth(pageParams.get('month')),
+  month: initialAtlasMonth(),
   theme: atlasThemes[pageParams.get('theme')] ? pageParams.get('theme') : '',
 };
+
+atlasTodayChipLabel.textContent = `今天 · ${JinghuaCalendar.todayLabel()}`;
 
 function projectCoordinate([longitude, latitude]) {
   return [
@@ -291,6 +326,9 @@ function renderDistricts(features) {
     if (!center) return;
     const [x, y] = projectCoordinate(center);
     const name = feature.properties.name.replace(/区$/, '');
+    // 引线要按"地点所属区"找到多边形和中心点，所以这里留下索引
+    districtShapes.set(name, path);
+    districtAnchors.set(name, { x, y });
     labelLayout.push({
       name,
       anchorX: x,
@@ -365,10 +403,15 @@ function markerMarkup(place, x, y) {
   const theme = atlasThemes[place.theme];
   const left = (x / MAP_WIDTH) * 100;
   const top = (y / MAP_HEIGHT) * 100;
+  const inRoute = atlasRoute.includes(place.id);
   return `
-    <button class="atlas-marker is-${theme.category}" style="left:${left.toFixed(3)}%;top:${top.toFixed(3)}%" type="button" data-place="${place.id}" aria-label="${place.name}，${place.district}" aria-pressed="false">
+    <button class="atlas-marker is-${theme.category}${inRoute ? ' is-in-route' : ''}" style="left:${left.toFixed(3)}%;top:${top.toFixed(3)}%" type="button" data-place="${place.id}" aria-label="${place.name}，${place.district}，${theme.theme}" aria-pressed="false">
       <svg aria-hidden="true"><use href="#atlas-icon-${theme.icon}"></use></svg>
-      <span>${place.name} · ${place.district}</span>
+      <span class="atlas-marker-card" aria-hidden="true">
+        <strong class="atlas-marker-name">${place.name}</strong>
+        <em class="atlas-marker-meta">${theme.theme} · ${place.district}</em>
+        <small class="atlas-marker-time">${theme.time}</small>
+      </span>
     </button>
   `;
 }
@@ -424,6 +467,7 @@ function spreadMarkerLayout() {
 
 function renderMarkers() {
   const layout = spreadMarkerLayout();
+  atlasPlaceLayout = new Map(atlasPlaces.map((place, index) => [place.id, layout[index]]));
   atlasMarkersElement.innerHTML = atlasPlaces.map((place, index) => markerMarkup(place, layout[index].x, layout[index].y)).join('');
   atlasMarkers = Array.from(atlasMarkersElement.querySelectorAll('[data-place]'));
   atlasMarkers.forEach((marker) => {
@@ -465,6 +509,17 @@ function applyAtlasFilters() {
 
   atlasMonthInput.value = String(atlasFilter.month);
 
+  // 「今天」按钮：看当月时点亮，点一下就跳回当前月份
+  const isThisMonth = JinghuaCalendar.isCurrentMonth(atlasFilter.month);
+  atlasTodayChip.classList.toggle('is-active', isThisMonth);
+  atlasTodayChip.setAttribute('aria-pressed', String(isThisMonth));
+  atlasTodayChip.setAttribute(
+    'aria-label',
+    isThisMonth
+      ? `当前已按本月（${JinghuaCalendar.currentMonth()}月）筛选`
+      : `回到本月（${JinghuaCalendar.currentMonth()}月）的观赏地点`,
+  );
+
   if (atlasFilter.theme) {
     const focusTheme = atlasThemes[atlasFilter.theme];
     atlasThemeChip.hidden = false;
@@ -484,10 +539,11 @@ function applyAtlasFilters() {
     if (visible) visibleCount += 1;
   });
 
-  atlasMonthOutput.textContent = `${JinghuaCalendar.monthText(atlasFilter.month)} · ${visibleCount} 处`;
+  atlasMonthOutput.textContent = `${JinghuaCalendar.monthScopeText(atlasFilter.month)} · ${visibleCount} 处`;
 
   if (!visibleCount) {
     renderEmptyDetail();
+    renderAnnotations();
     return;
   }
 
@@ -497,6 +553,8 @@ function applyAtlasFilters() {
     const firstVisible = atlasMarkers.find((marker) => !marker.hidden);
     if (firstVisible) selectPlace(firstVisible.dataset.place);
   }
+  // 勾选变化会隐藏部分标记，引线与路线图钉要跟着重画
+  renderAnnotations();
 }
 
 /** 类别 × 月份筛选后没有任何地点时的空态 */
@@ -514,6 +572,7 @@ function renderEmptyDetail() {
   atlasDetailLead.textContent = '换一个月份或类别，可以看到更多可观赏的自然地点。';
   atlasDetailQuote.textContent = '';
   atlasDetailEnter.hidden = true;
+  updateRouteButton();
   syncAtlasUrl();
 }
 
@@ -569,6 +628,9 @@ function selectPlace(placeId) {
   atlasDetailEnter.href = JinghuaCalendar.speciesHref(place.theme);
   atlasDetailEnter.innerHTML = `进入「${theme.theme}」主页<span aria-hidden="true">↗</span>`;
 
+  // 换一个地点就要重算按钮：新地点可能不在路线里，文案必须跟着变
+  updateRouteButton();
+  renderAnnotations();
   syncAtlasUrl();
 }
 
@@ -583,6 +645,11 @@ function bindLegendControls() {
 
   atlasMonthInput.addEventListener('input', () => {
     atlasFilter.month = JinghuaCalendar.normalizeMonth(atlasMonthInput.value);
+    applyAtlasFilters();
+  });
+
+  atlasTodayChip.addEventListener('click', () => {
+    atlasFilter.month = JinghuaCalendar.currentMonth();
     applyAtlasFilters();
   });
 
@@ -602,6 +669,334 @@ async function loadDistricts() {
   return response.json();
 }
 
+/* ---------- 地图探索增强 ----------
+ * 四件事：
+ *   ① 标记悬浮卡 —— 挂在 marker 内部，跟着 marker 一起做反向缩放补偿，始终是自然大小
+ *   ② 选中引线 —— 从选中地点拉一条虚线到所属行政区中心，并高亮该区
+ *   ③ 拖拽平移 + Ctrl/⌘ 滚轮缩放（另配 +/−/复位 按钮，保证不用滚轮也能操作）
+ *   ④ 半日路线 —— 把地点依次加入路线，连成虚线并估算总时长
+ * 所有几何都画在底图坐标系（1000×840）里，跟着 .atlas-map-layer 一起变换，
+ * 所以平移缩放之后引线和路线不会错位。 */
+
+const MIN_ZOOM = 1;
+const MAX_ZOOM = 4;
+const mapView = { zoom: MIN_ZOOM, x: 0, y: 0 };
+let dragMoved = false;
+let zoomIdleTimer;
+
+function clampZoom(value) {
+  if (!Number.isFinite(value)) return MIN_ZOOM;
+  return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, value));
+}
+
+/** 平移范围：不允许把地图拖出画框（zoom = 1 时只能停在 0,0） */
+function clampPan(x, y, zoom, width, height) {
+  const minX = width * (1 - zoom);
+  const minY = height * (1 - zoom);
+  return [Math.min(0, Math.max(minX, x)), Math.min(0, Math.max(minY, y))];
+}
+
+/** 以 (px, py) 为锚点把缩放从 state.zoom 变到 nextZoom，返回新的视口状态 */
+function zoomAtPoint(state, nextZoom, px, py) {
+  const zoom = clampZoom(nextZoom);
+  const ratio = zoom / state.zoom;
+  return { zoom, x: px - (px - state.x) * ratio, y: py - (py - state.y) * ratio };
+}
+
+/** "1—2小时" / "1.5—3小时" → [1, 2]；解析不了返回 null */
+function parseDurationHours(text) {
+  const match = /(\d+(?:\.\d+)?)\s*[—\-~～至到]\s*(\d+(?:\.\d+)?)/.exec(String(text == null ? '' : text));
+  if (!match) return null;
+  const min = Number(match[1]);
+  const max = Number(match[2]);
+  if (!Number.isFinite(min) || !Number.isFinite(max) || max < min) return null;
+  return [min, max];
+}
+
+/** 路线总时长与档位；只要有一站时长解析不出来，就不给总时长 */
+function routePlan(placeIds) {
+  const stops = placeIds
+    .map((id) => atlasPlaces.find((place) => place.id === id))
+    .filter(Boolean);
+  let min = 0;
+  let max = 0;
+  let complete = stops.length > 0;
+  stops.forEach((place) => {
+    const parsed = parseDurationHours((atlasThemes[place.theme] || {}).duration);
+    if (!parsed) {
+      complete = false;
+      return;
+    }
+    min += parsed[0];
+    max += parsed[1];
+  });
+  return {
+    stops,
+    count: stops.length,
+    min: complete ? min : null,
+    max: complete ? max : null,
+    // 四小时半以内按半日算，超过就是全日
+    label: complete && max <= 4.5 ? '半日路线' : '全日路线',
+  };
+}
+
+function formatHours(value) {
+  return Number.isInteger(value) ? String(value) : value.toFixed(1);
+}
+
+function applyMapView() {
+  const width = atlasMapLayer.offsetWidth || 1;
+  const height = atlasMapLayer.offsetHeight || 1;
+  [mapView.x, mapView.y] = clampPan(mapView.x, mapView.y, mapView.zoom, width, height);
+  atlasMapLayer.style.transform = `translate(${mapView.x.toFixed(2)}px, ${mapView.y.toFixed(2)}px) scale(${mapView.zoom.toFixed(4)})`;
+  // marker / 路线图钉用 --map-zoom 做反向缩放，缩放后仍是自然大小
+  atlasMapFrame.style.setProperty('--map-zoom', String(mapView.zoom));
+  atlasMapFrame.classList.toggle('is-zoomed', mapView.zoom > 1.001);
+  atlasZoomIn.disabled = mapView.zoom >= MAX_ZOOM - 0.001;
+  atlasZoomOut.disabled = mapView.zoom <= MIN_ZOOM + 0.001;
+}
+
+/** 不传 px/py 就以画框中心为锚点 */
+function zoomTo(nextZoom, px, py) {
+  const width = atlasMapLayer.offsetWidth || 1;
+  const height = atlasMapLayer.offsetHeight || 1;
+  const anchorX = px === undefined ? width / 2 : px;
+  const anchorY = py === undefined ? height / 2 : py;
+  Object.assign(mapView, zoomAtPoint(mapView, nextZoom, anchorX, anchorY));
+  // 连续滚轮时先把 marker 的 transform 过渡关掉，否则会一直追不上缩放
+  atlasMapFrame.classList.add('is-transforming');
+  window.clearTimeout(zoomIdleTimer);
+  zoomIdleTimer = window.setTimeout(() => {
+    atlasMapFrame.classList.remove('is-transforming');
+  }, 220);
+  applyMapView();
+}
+
+function resetMapView() {
+  mapView.zoom = MIN_ZOOM;
+  mapView.x = 0;
+  mapView.y = 0;
+  applyMapView();
+}
+
+let atlasAnnotationArt = null;
+let atlasAnnotationRoute = null;
+let atlasAnnotationLeader = null;
+let atlasRoutePins = null;
+
+function ensureAnnotationArt() {
+  if (atlasAnnotationArt) return;
+  atlasAnnotationArt = createSvgElement('svg', {
+    class: 'atlas-annotations',
+    viewBox: `0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`,
+    preserveAspectRatio: 'none',
+    'aria-hidden': 'true',
+  });
+  atlasAnnotationRoute = createSvgElement('polyline', { class: 'atlas-annotation-route' });
+  atlasAnnotationLeader = createSvgElement('line', { class: 'atlas-annotation-leader' });
+  atlasAnnotationArt.appendChild(atlasAnnotationRoute);
+  atlasAnnotationArt.appendChild(atlasAnnotationLeader);
+  // 插在底图之后、标记之前：标记仍在最上层，点击不受影响
+  atlasMapLayer.insertBefore(atlasAnnotationArt, atlasMarkersElement);
+
+  atlasRoutePins = document.createElement('div');
+  atlasRoutePins.className = 'atlas-route-pins';
+  atlasMapLayer.appendChild(atlasRoutePins);
+}
+
+function markerVisible(placeId) {
+  const marker = atlasMarkers.find((item) => item.dataset.place === placeId);
+  return marker ? !marker.hidden : false;
+}
+
+/** 引线与路线都只画"当前筛选下可见"的地点，避免筛选后留下指向空处的线 */
+function renderAnnotations() {
+  ensureAnnotationArt();
+
+  const activePlace = activePlaceId ? atlasPlaces.find((place) => place.id === activePlaceId) : null;
+  const activePoint = activePlace && markerVisible(activePlace.id) ? atlasPlaceLayout.get(activePlace.id) : null;
+
+  // ② 引线：选中地点 → 所属行政区中心，并高亮该区
+  districtShapes.forEach((shape) => shape.classList.remove('is-focused'));
+  let leaderOn = false;
+  if (activePlace && activePoint) {
+    const districtName = activePlace.district.replace(/区$/, '');
+    const anchor = districtAnchors.get(districtName);
+    const shape = districtShapes.get(districtName);
+    if (shape) shape.classList.add('is-focused');
+    if (anchor) {
+      atlasAnnotationLeader.setAttribute('x1', activePoint.x.toFixed(2));
+      atlasAnnotationLeader.setAttribute('y1', activePoint.y.toFixed(2));
+      atlasAnnotationLeader.setAttribute('x2', anchor.x.toFixed(2));
+      atlasAnnotationLeader.setAttribute('y2', anchor.y.toFixed(2));
+      leaderOn = true;
+    }
+  }
+  atlasAnnotationLeader.classList.toggle('is-visible', leaderOn);
+
+  // ④ 路线：只连可见站点，并按可见顺序重新编号
+  const stops = atlasRoute
+    .map((id) => ({
+      id,
+      place: atlasPlaces.find((place) => place.id === id),
+      point: atlasPlaceLayout.get(id),
+    }))
+    .filter((stop) => stop.place && stop.point && markerVisible(stop.id));
+
+  atlasAnnotationRoute.setAttribute('points', stops.map((stop) => `${stop.point.x.toFixed(2)},${stop.point.y.toFixed(2)}`).join(' '));
+  atlasAnnotationRoute.classList.toggle('is-visible', stops.length > 1);
+  atlasRoutePins.innerHTML = stops.map((stop, index) => (
+    `<span class="atlas-route-pin" style="left:${((stop.point.x / MAP_WIDTH) * 100).toFixed(3)}%;top:${((stop.point.y / MAP_HEIGHT) * 100).toFixed(3)}%" aria-hidden="true"><i>${index + 1}</i></span>`
+  )).join('');
+}
+
+function syncMarkerRouteState() {
+  atlasMarkers.forEach((marker) => {
+    marker.classList.toggle('is-in-route', atlasRoute.includes(marker.dataset.place));
+  });
+}
+
+function renderRouteBar() {
+  const plan = routePlan(atlasRoute);
+  atlasRouteBar.hidden = plan.count === 0;
+  if (!plan.count) {
+    atlasRouteStops.innerHTML = '';
+    atlasRouteTotal.textContent = '';
+    return;
+  }
+  atlasRouteTitle.textContent = plan.label;
+  atlasRouteStops.innerHTML = plan.stops.map((place, index) => `
+    <li class="atlas-route-stop">
+      <button type="button" data-route-remove="${place.id}" aria-label="把${place.name}移出路线">
+        <span class="atlas-route-stop-index">${index + 1}</span>
+        <span class="atlas-route-stop-name">${place.name}</span>
+        <span class="atlas-route-stop-x" aria-hidden="true">×</span>
+      </button>
+    </li>
+  `).join('');
+  atlasRouteTotal.textContent = plan.min === null
+    ? `${plan.count} 站 · 时长待定`
+    : `${plan.count} 站 · 约 ${formatHours(plan.min)}—${formatHours(plan.max)} 小时`;
+}
+
+/** 详情面板上的"加入/移出路线"按钮文案与状态 */
+function updateRouteButton() {
+  const place = atlasPlaces.find((item) => item.id === activePlaceId);
+  if (!place) {
+    atlasDetailRoute.hidden = true;
+    atlasDetailRoute.textContent = '';
+    return;
+  }
+  const index = atlasRoute.indexOf(place.id);
+  const isFull = atlasRoute.length >= ATLAS_ROUTE_LIMIT && index === -1;
+  atlasDetailRoute.hidden = false;
+  atlasDetailRoute.disabled = isFull;
+  atlasDetailRoute.classList.toggle('is-added', index !== -1);
+  atlasDetailRoute.setAttribute('aria-pressed', String(index !== -1));
+  if (index !== -1) atlasDetailRoute.textContent = `移出路线（第 ${index + 1} 站）`;
+  else if (isFull) atlasDetailRoute.textContent = `路线已满（最多 ${ATLAS_ROUTE_LIMIT} 站）`;
+  else atlasDetailRoute.textContent = '加入半日路线';
+}
+
+function toggleRouteStop(placeId) {
+  const index = atlasRoute.indexOf(placeId);
+  if (index !== -1) atlasRoute.splice(index, 1);
+  else if (atlasRoute.length < ATLAS_ROUTE_LIMIT) atlasRoute.push(placeId);
+  syncMarkerRouteState();
+  renderRouteBar();
+  renderAnnotations();
+  updateRouteButton();
+}
+
+function bindMapView() {
+  atlasZoomIn.addEventListener('click', () => zoomTo(mapView.zoom * 1.4));
+  atlasZoomOut.addEventListener('click', () => zoomTo(mapView.zoom / 1.4));
+  atlasZoomReset.addEventListener('click', resetMapView);
+
+  // 不按 Ctrl/⌘ 时不拦截滚轮，鼠标停在图上也能正常滚动页面
+  atlasMapFrame.addEventListener('wheel', (event) => {
+    if (!event.ctrlKey && !event.metaKey) return;
+    event.preventDefault();
+    const rect = atlasMapFrame.getBoundingClientRect();
+    zoomTo(
+      mapView.zoom * Math.exp(-event.deltaY * 0.0015),
+      event.clientX - rect.left - atlasMapFrame.clientLeft,
+      event.clientY - rect.top - atlasMapFrame.clientTop,
+    );
+  }, { passive: false });
+
+  let drag = null;
+
+  atlasMapFrame.addEventListener('pointerdown', (event) => {
+    if (event.button !== 0) return;
+    // 每次按下都先清掉上一次拖拽留下的标记，否则点过"复位"之后
+    // 第一次点标记会被那个过期的标记吃掉
+    dragMoved = false;
+    if (event.target.closest('.atlas-map-controls')) return;
+    // 没有放大时本就无处可平移，不留拖拽手势，也就不会和点击冲突
+    if (mapView.zoom <= 1.001) return;
+    drag = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      originX: mapView.x,
+      originY: mapView.y,
+    };
+    atlasMapFrame.setPointerCapture(event.pointerId);
+    atlasMapFrame.classList.add('is-panning');
+  });
+
+  atlasMapFrame.addEventListener('pointermove', (event) => {
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    const dx = event.clientX - drag.startX;
+    const dy = event.clientY - drag.startY;
+    // 4px 以内仍算点击，避免手抖把选中操作吃掉
+    if (!dragMoved && Math.hypot(dx, dy) < 4) return;
+    dragMoved = true;
+    mapView.x = drag.originX + dx;
+    mapView.y = drag.originY + dy;
+    applyMapView();
+  });
+
+  const endDrag = (event) => {
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    if (atlasMapFrame.hasPointerCapture(event.pointerId)) {
+      atlasMapFrame.releasePointerCapture(event.pointerId);
+    }
+    drag = null;
+    atlasMapFrame.classList.remove('is-panning');
+  };
+  atlasMapFrame.addEventListener('pointerup', endDrag);
+  atlasMapFrame.addEventListener('pointercancel', endDrag);
+
+  // 拖动结束后浏览器还会补一个 click，这里吃掉它，免得顺手选中一个地点
+  atlasMapFrame.addEventListener('click', (event) => {
+    if (!dragMoved) return;
+    dragMoved = false;
+    event.stopPropagation();
+    event.preventDefault();
+  }, true);
+}
+
+function bindRouteControls() {
+  atlasDetailRoute.addEventListener('click', () => {
+    if (activePlaceId) toggleRouteStop(activePlaceId);
+  });
+
+  atlasRouteStops.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-route-remove]');
+    if (button) toggleRouteStop(button.dataset.routeRemove);
+  });
+
+  atlasRouteClear.addEventListener('click', () => {
+    atlasRoute.length = 0;
+    syncMarkerRouteState();
+    renderRouteBar();
+    renderAnnotations();
+    updateRouteButton();
+  });
+}
+
 async function initializeAtlas() {
   try {
     const geojson = await loadDistricts();
@@ -615,9 +1010,13 @@ async function initializeAtlas() {
 
   renderMarkers();
   bindLegendControls();
+  bindMapView();
+  bindRouteControls();
   applyEntryParams();
   applyAtlasFilters();
+  renderRouteBar();
   selectPlace(activePlaceId);
+  applyMapView();
 }
 
 initializeAtlas();

@@ -2,7 +2,10 @@
 2026年北京市大学生数字媒体设计竞赛报名表.docx
 announcement.png
 preview-server.mjs
-docs/secondary-page-copy.md
+# docs/ 是本地考据与备赛资料，不随网站发布
+docs/
+作品网页入口链接.md
+.workbuddy/
 *.log
 *.mp4
 .tools/

@@ -82,6 +82,28 @@
     return season ? SEASON_LABEL[season] : '';
   }
 
+  /* ---------- 今天 ----------
+   * 「今天的京华自然」整套逻辑都从本地时区的当前日期出发，不写死任何常量，
+   * 首页年历与观赏地图共用这三个函数，保证两边永远指的"当月"是同一个。 */
+  function currentMonth() {
+    return new Date().getMonth() + 1;
+  }
+
+  function todayLabel() {
+    const now = new Date();
+    return `${now.getMonth() + 1}月${now.getDate()}日`;
+  }
+
+  function isCurrentMonth(month) {
+    return Boolean(month) && month === currentMonth();
+  }
+
+  /** 「本月 / 3月」这类给界面用的月份说法：当月说"本月"，其余说"3月" */
+  function monthScopeText(month) {
+    if (!month) return '全年';
+    return isCurrentMonth(month) ? '本月' : monthText(month);
+  }
+
   /** 观赏地图 → 物种页 */
   function speciesHref(slug) {
     if (slug === 'yulan') return 'yulan.html';
@@ -252,6 +274,10 @@
     seasonLabelOf,
     seasonText,
     monthText,
+    monthScopeText,
+    currentMonth,
+    todayLabel,
+    isCurrentMonth,
     mapHref,
     speciesHref,
     themeTabsHtml,

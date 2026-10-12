@@ -1,6 +1,7 @@
 const monthButtons = Array.from(document.querySelectorAll('.month-button'));
 const monthSummary = document.getElementById('monthSummary');
 const monthMapLink = document.getElementById('monthMapLink');
+const todayButton = document.getElementById('todayButton');
 const categoryItems = Array.from(document.querySelectorAll('.category-item'));
 const categoryGuide = document.querySelector('.category-guide');
 const exhibitionMode = document.getElementById('exhibitionMode');
@@ -77,24 +78,37 @@ function startCarousel(index) {
 function applyMonth(month) {
   const calendar = JinghuaCalendar;
   const visibleSlugs = new Set(calendar.themesInMonth(month).map((item) => item.slug));
+  const isThisMonth = calendar.isCurrentMonth(month);
 
   monthButtons.forEach((button) => {
     const isActive = Number(button.dataset.month) === month;
     button.classList.toggle('is-active', isActive);
     button.setAttribute('aria-pressed', String(isActive));
+    // 当月的那个月份按钮额外标出来，让"为什么默认停在这个月"一眼可见
+    button.classList.toggle('is-today', isThisMonth && isActive);
   });
 
   categoryItems.forEach((item) => {
-    item.hidden = !calendar.isInMonth(item.dataset.slug, month);
+    const inMonth = calendar.isInMonth(item.dataset.slug, month);
+    item.hidden = !inMonth;
+    // "本月"角标只在看当月、且这个主题确实当月可赏时出现
+    item.classList.toggle('is-current', isThisMonth && inMonth);
   });
   categoryGuide.classList.toggle('is-filtered', Boolean(month));
 
+  todayButton.classList.toggle('is-active', isThisMonth);
+  todayButton.setAttribute('aria-pressed', String(isThisMonth));
+  todayButton.setAttribute(
+    'aria-label',
+    isThisMonth ? '当前展示的就是本月可赏主题' : '回到本月可赏主题',
+  );
+
   const count = month ? visibleSlugs.size : calendar.THEMES.length;
   monthSummary.textContent = month
-    ? `${calendar.monthText(month)} · ${calendar.seasonText(month)} · ${count} 个主题可赏`
+    ? `${calendar.monthScopeText(month)} · ${calendar.seasonText(month)} · ${count} 个主题可赏`
     : `全年 · ${count} 个主题`;
   monthMapLink.href = calendar.mapHref('', month);
-  monthMapLink.setAttribute('aria-label', month ? `在观赏地图上查看 ${month} 月的观赏地点` : '在观赏地图上查看全部观赏地点');
+  monthMapLink.setAttribute('aria-label', month ? `在观赏地图上查看 ${calendar.monthText(month)}的观赏地点` : '在观赏地图上查看全部观赏地点');
 
   if (month) {
     const firstIndex = carouselSlides.findIndex((slide) => visibleSlugs.has(slide.slug));
@@ -102,13 +116,60 @@ function applyMonth(month) {
   }
 }
 
+/* ---------- 今天的京华自然 ----------
+ * 打开首页默认就落在"当月"，而不是全年：月份按钮、主题筛选、轮播与
+ * "在地图上查看"的深链会一起对齐到同一个月份。
+ * 用户在本次会话里手动选过月份的话优先尊重他的选择（sessionStorage，
+ * 关掉标签页即失效），这样从主题页返回首页不会把筛选重置掉。 */
+const HOME_MONTH_KEY = 'jinghua-home-month';
+
+function readPreferredMonth() {
+  try {
+    const stored = window.sessionStorage.getItem(HOME_MONTH_KEY);
+    if (stored !== null) return JinghuaCalendar.normalizeMonth(stored);
+  } catch (error) {
+    /* 隐私模式下 sessionStorage 可能不可用，退回当月 */
+  }
+  return JinghuaCalendar.currentMonth();
+}
+
+function rememberMonth(month) {
+  try {
+    window.sessionStorage.setItem(HOME_MONTH_KEY, String(month));
+  } catch (error) {
+    /* 忽略 */
+  }
+}
+
+/** 给每个主题条目挂一个"本月"角标，位置由 .category-item 的第三列负责 */
+categoryItems.forEach((item) => {
+  if (item.querySelector('.category-now')) return;
+  const badge = document.createElement('span');
+  badge.className = 'category-now';
+  badge.textContent = '本月';
+  item.appendChild(badge);
+});
+
+todayButton.textContent = `今天 · ${JinghuaCalendar.todayLabel()}`;
+
 startCarousel(0);
 
 monthButtons.forEach((button) => {
   button.addEventListener('click', () => {
-    applyMonth(JinghuaCalendar.normalizeMonth(button.dataset.month));
+    const month = JinghuaCalendar.normalizeMonth(button.dataset.month);
+    rememberMonth(month);
+    applyMonth(month);
   });
 });
+
+todayButton.addEventListener('click', () => {
+  const month = JinghuaCalendar.currentMonth();
+  rememberMonth(month);
+  applyMonth(month);
+});
+
+/** 首屏对齐到当月（或本会话里用户自己选的月份） */
+applyMonth(readPreferredMonth());
 
 exhibitionMode.addEventListener('click', () => {
   exhibitionMode.classList.add('is-playing');
