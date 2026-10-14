@@ -45,6 +45,20 @@ function updateProgress() {
 let carouselSlideIndex = 0;
 let carouselTimers = [];
 let carouselInterval;
+let carouselRenderToken = 0;
+let carouselStarted = false;
+
+/* 每一阶段的展示间隔：线稿 → 过渡版 → 完整版 */
+const STAGE_INTERVAL = 1300;
+
+/** 把某一组的三张图提前塞进浏览器缓存，切换时才不会"空一拍" */
+function preloadSlide(slideIndex) {
+  const slide = carouselSlides[slideIndex % carouselSlides.length];
+  slide.images.forEach((name) => {
+    const image = new Image();
+    image.src = `material/shouye/${name}`;
+  });
+}
 
 function showCarouselSlide(slideIndex) {
   carouselTimers.forEach((timer) => window.clearTimeout(timer));
@@ -52,20 +66,57 @@ function showCarouselSlide(slideIndex) {
   carouselSlideIndex = slideIndex;
   const slide = carouselSlides[slideIndex % carouselSlides.length];
   carouselTitle.textContent = slide.title;
-  carouselImages.innerHTML = slide.images.map((name, index) => (
-    `<img class="overview-carousel-image ${index === 0 ? 'is-active' : ''}" src="material/shouye/${name}" alt="" />`
-  )).join('');
 
-  const images = Array.from(carouselImages.querySelectorAll('img'));
-  images.forEach((image, index) => {
+  // 旧的一组先留在原地，新的一组盖在它上面淡入。
+  // 直接清空容器的话，换主题时会"旧图瞬间消失 → 空白 → 新图出现"，看着就是一卡。
+  // 同时必须立刻摘掉旧的 is-active：否则旧图会一直停在 0.8，
+  // 在新图彼此交替的间隙里透出来，看起来就是两层图糊在一起。
+  const previous = Array.from(carouselImages.querySelectorAll('img'));
+  previous.forEach((image) => image.classList.remove('is-active'));
+
+  // 这里刻意不给第一张加 is-active：
+  // 带着 is-active 建出来的元素，浏览器首次计算样式就是 opacity 0.8，
+  // 而 CSS 过渡不会在初始样式上触发——线稿会"啪"地出现，而不是淡入。
+  const images = slide.images.map((name) => {
+    const image = document.createElement('img');
+    image.className = 'overview-carousel-image';
+    image.alt = '';
+    image.src = `material/shouye/${name}`;
+    carouselImages.appendChild(image);
+    return image;
+  });
+
+  const token = ++carouselRenderToken;
+
+  // 关键：等三张图都加载完再走时序。
+  // 否则过渡版/完整版会在图片还没到的时候就开始淡入，看上去就是一跳一跳的跳变。
+  Promise.all(images.map((image) => (
+    image.complete ? Promise.resolve() : new Promise((resolve) => {
+      image.addEventListener('load', resolve, { once: true });
+      image.addEventListener('error', resolve, { once: true });
+    })
+  ))).then(() => {
+    if (token !== carouselRenderToken) return;
+    images.forEach((image, index) => {
       carouselTimers.push(window.setTimeout(() => {
+        if (token !== carouselRenderToken) return;
         images.forEach((item) => item.classList.remove('is-active'));
         image.classList.add('is-active');
-      }, index * 1300));
+      }, index * STAGE_INTERVAL));
+    });
+    // 旧的这一组已经淡出（CSS 过渡 1500ms），等它彻底透明后再摘掉
+    if (previous.length) {
+      carouselTimers.push(window.setTimeout(() => {
+        previous.forEach((image) => image.remove());
+      }, STAGE_INTERVAL + 300));
+    }
+    // 趁这一组还在展示，把下一组预热进缓存
+    preloadSlide(slideIndex + 1);
   });
 }
 
 function startCarousel(index) {
+  carouselStarted = true;
   showCarouselSlide(index);
   window.clearInterval(carouselInterval);
   carouselInterval = window.setInterval(() => {
@@ -150,10 +201,6 @@ categoryItems.forEach((item) => {
   item.appendChild(badge);
 });
 
-/* 背景轮播先起步。它是首页唯一的图像层，而且完全不依赖自然年历，
-   所以必须放在任何年历调用之前——否则年历一出问题，首页背景会一起变空白。 */
-startCarousel(0);
-
 /* 「今天的京华自然」初始化。
    万一 theme-calendar.js 没就绪（被拦、加载失败、解析出错等），
    这里退化成"全年"而不是让整段脚本中断，标题栏与主题列表照常可用。 */
@@ -174,11 +221,17 @@ try {
     applyMonth(month);
   });
 
-  /** 首屏对齐到当月（或本会话里用户自己选的月份） */
+  /** 首屏对齐到当月（或本会话里用户自己选的月份）。
+      当月有可赏主题时，applyMonth 会顺手把轮播开到该主题上。 */
   applyMonth(readPreferredMonth());
 } catch (error) {
   console.error('自然年历初始化失败，首页退化为全年视图', error);
 }
+
+/* 轮播兜底。正常路径下 applyMonth 已经把它开好了，这里绝不能再启动一次：
+   重复调用会重建 <img>，把上一次还在飞行中的图片请求丢掉重来，
+   首屏会白闪一下、再从当前主题跳回第一个主题。 */
+if (!carouselStarted) startCarousel(0);
 
 exhibitionMode.addEventListener('click', () => {
   exhibitionMode.classList.add('is-playing');
